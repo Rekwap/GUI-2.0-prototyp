@@ -22,6 +22,8 @@ interface ControlPanelProps {
   onReset?: () => void;
   zoomLevel?: number;
   onZoomLevelChange?: (zoom: number) => void;
+  landscapeVariant?: 'A' | 'B';
+  onLandscapeVariantChange?: (variant: 'A' | 'B') => void;
 }
 
 export default function ControlPanel({
@@ -42,7 +44,9 @@ export default function ControlPanel({
   uniqueId = '',
   onReset,
   zoomLevel = 100,
-  onZoomLevelChange
+  onZoomLevelChange,
+  landscapeVariant,
+  onLandscapeVariantChange
 }: ControlPanelProps) {
   return (
     <div className="flex flex-col h-[480px] w-[320px] p-6 bg-[rgb(233,233,233)] rounded-lg shadow-md flex-shrink-0 overflow-auto">
@@ -66,6 +70,38 @@ export default function ControlPanel({
             <Label htmlFor={`ultrasonic-alt-workflow${uniqueId}`}>Ultrasonic Alt. Workflow</Label>
           </div>
         </div>
+
+        {/* Landscape-Variante A/B (nur wenn aktiviert) */}
+        {onLandscapeVariantChange && (
+          <>
+            <div className="border-t" />
+            <div className="flex flex-col gap-2">
+              <Label>Landscape-Variante</Label>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id={`landscape-variant-a${uniqueId}`}
+                    name={`landscape-variant${uniqueId}`}
+                    checked={landscapeVariant === 'A'}
+                    onChange={() => onLandscapeVariantChange('A')}
+                  />
+                  <Label htmlFor={`landscape-variant-a${uniqueId}`}>Variante A</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id={`landscape-variant-b${uniqueId}`}
+                    name={`landscape-variant${uniqueId}`}
+                    checked={landscapeVariant === 'B'}
+                    onChange={() => onLandscapeVariantChange('B')}
+                  />
+                  <Label htmlFor={`landscape-variant-b${uniqueId}`}>Variante B</Label>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Separator */}
         <div className="border-t" />

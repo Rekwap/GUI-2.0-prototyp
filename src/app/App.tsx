@@ -51,6 +51,10 @@ import DisplayComponent from './imports/Display';
 import LanguageComponent from './imports/Language';
 import DialogRestartComponent from './imports/DialogRestart';
 import BmiBsaMenu from './components/BmiBsaMenu';
+import ScreenFrameLandscape from './components/landscape/ScreenFrameLandscape';
+import MainScreenLandscape from './components/landscape/MainScreenLandscape';
+import TareAssistantLandscapeA from './components/landscape/TareAssistantLandscapeA';
+import TareAssistantLandscapeB from './components/landscape/TareAssistantLandscapeB';
 
 // Wrapper component for consistent layout
 function ScreenWrapper({ children, controls }: { children: React.ReactNode; controls: React.ReactNode}) {
@@ -849,6 +853,12 @@ function AppContent() {
   
   // Control Panel visibility (visible by default)
   const [showControlPanel, setShowControlPanel] = useState(true);
+
+  // Layout: aktuell fix Landscape (Portrait bleibt als Code erhalten, wird nicht gerendert).
+  // Kein Portrait/Landscape-Umschalter – nur die Variante wird gewechselt.
+  const layout: 'portrait' | 'landscape' = 'landscape';
+  // Landscape A/B-Vergleichsvariante
+  const [landscapeVariant, setLandscapeVariant] = useState<'A' | 'B'>('A');
   
   // Previous value screen state
   const [showPreviousValue, setShowPreviousValue] = useState(false);
@@ -1600,6 +1610,103 @@ function AppContent() {
       handleHeightClick();
     }
   };
+
+  // ---- LANDSCAPE-Renderpfad (Portrait bleibt unberührt darunter) ----
+  if (layout === 'landscape') {
+    const landscapeControls = showControlPanel ? (
+      <ControlPanel
+        heightMode={heightMode}
+        onHeightModeChange={setHeightMode}
+        heightRequired={heightRequired}
+        onHeightRequiredChange={setHeightRequired}
+        installationMode={installationMode}
+        onInstallationModeChange={setInstallationMode}
+        isMetric={isMetric}
+        onIsMetricChange={setIsMetric}
+        loginMode={loginMode}
+        onLoginModeChange={setLoginMode}
+        testHeight={testHeight}
+        onTestHeightChange={setTestHeight}
+        ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
+        onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
+        uniqueId="-landscape"
+        onReset={handleReset}
+        zoomLevel={zoomLevel}
+        onZoomLevelChange={setZoomLevel}
+        landscapeVariant={landscapeVariant}
+        onLandscapeVariantChange={setLandscapeVariant}
+      />
+    ) : null;
+
+    // Tare Assistant (A/B) – nutzt dieselbe Engine-Logik wie das Portrait-PreTare
+    if (showTareAssistant) {
+      const TareAssistant = landscapeVariant === 'A' ? TareAssistantLandscapeA : TareAssistantLandscapeB;
+      return (
+        <ScreenFrameLandscape zoomLevel={zoomLevel} controls={landscapeControls} dataName="Tare Assistant (Landscape)">
+          <TareAssistant
+            weight={formatWeight(weight)}
+            isMetric={isMetric}
+            taredWeight={taredWeight}
+            activePreTareValues={preTareValues}
+            onPreTareToggle={(value: string) => {
+              const newValues = preTareValues.includes(value)
+                ? preTareValues.filter(v => v !== value)
+                : [...preTareValues, value];
+              setPreTareValues(newValues);
+              const measuredWeight = parseFloat(rawWeight);
+              const totalPreTare = newValues.reduce((sum, v) => sum + parseFloat(v), 0);
+              const manualTare = taredWeight ? parseFloat(taredWeight) : 0;
+              const netWeight = measuredWeight - (totalPreTare + manualTare);
+              setWeight((isMetric ? netWeight : kgToLbs(netWeight)).toFixed(2));
+              setShowTareAssistant(false);
+            }}
+            onManualTareClick={handleManualTareClick}
+            onTareConfirm={handleTareConfirm}
+            onBack={handleTareBack}
+          />
+        </ScreenFrameLandscape>
+      );
+    }
+
+    // Manuelle Tara-Eingabe (interim: bestehende Portrait-Komponente im Portrait-Kärtchen)
+    if (showManualTare) {
+      return (
+        <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
+          <div
+            className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0"
+            data-name="Manual Tare (Landscape interim)"
+            style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'center center' }}
+          >
+            <ManualTareInput onBack={handleManualTareBack} onConfirm={handleManualTareConfirm} isMetric={isMetric} initialValue={taredWeight} />
+          </div>
+          {landscapeControls}
+        </div>
+      );
+    }
+
+    // Landscape-Hauptscreen (Einstieg)
+    return (
+      <ScreenFrameLandscape zoomLevel={zoomLevel} controls={landscapeControls} dataName="iScale (Landscape)">
+        <MainScreenLandscape
+          weight={formatWeight(weight)}
+          rawWeight={rawWeight}
+          isMetric={isMetric}
+          taredWeight={taredWeight}
+          preTareValues={preTareValues}
+          installationMode={installationMode}
+          bmiLabel={getDisplayLabel()}
+          showReweightButton={showReweightButton}
+          isReweighting={isReweighting}
+          onMenuClick={handleMenuClick}
+          onTareClick={handleTareClick}
+          onRecallClick={handleRecallClick}
+          onSendClick={handleSendClick}
+          onReweight={handleReweight}
+          onRemoveTare={handleRemoveTare}
+        />
+      </ScreenFrameLandscape>
+    );
+  }
 
   // Show different screens based on state
   if (showMenu) {

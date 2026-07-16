@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>seca Waagen-Prototyp — CORELINE Display</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* seca Tokens (echt aus der Figma-Datei) */
+    --seca-display-bg:#E7EBF7;
+    --seca-text-primary:#191C24;
+    --seca-passive-grey:#656D89;
+    --seca-blue:#98B0D8;
+    --seca-btn-grey:#8B8D91;
+    --seca-green:#06A94E;
+    --seca-green-bg:#DAF2E5;
+    --seca-white:#FFFFFF;
+    /* UI des Control Panels */
+    --bg:#15171c; --panel:#1e2128; --panel-line:#2c3038;
+    --ink:#e8eaee; --ink-dim:#8b909c; --ink-faint:#5a5f6b;
+    --accent:#7d9bd6; --accent-soft:#3a4a6b; --field:#2b2f38; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
+    min-height:100vh; display:flex; align-items:flex-start;
+    justify-content:center; gap:48px; padding:56px 40px; flex-wrap:wrap;
+  }
+  .seca-font{font-family:"Noto Sans",sans-serif}
+
+  /* ---------- STAGE ---------- */
+  .stage{display:flex; flex-direction:column; align-items:center; gap:18px}
+  .badge{font-size:13px; color:var(--ink-dim); background:var(--panel);
+    border:1px solid var(--panel-line); border-radius:8px; padding:6px 14px}
+
+  .screen-wrap{position:relative; transform-origin:top center; transition:transform .15s}
+
+  /* Display-Frame 480×272, exakt wie Figma */
+  .display{position:relative; width:480px; height:272px; background:var(--seca-white);
+    border-radius:0; overflow:hidden; box-shadow:0 4px 20px 5px rgba(0,0,0,.35)}
+  /* Statusbar */
+  .statusbar{position:absolute; top:0; left:0; width:480px; height:50px; background:var(--seca-display-bg)}
+  .statusbar .menu{position:absolute; left:19px; top:13px; width:24px; height:24px; color:var(--seca-text-primary)}
+  .statusbar .wifi{position:absolute; left:453px; top:13px; width:24px; height:24px; color:var(--seca-passive-grey)}
+  /* Weight-Bereich */
+  .weightzone{position:absolute; left:0; bottom:0; width:480px; height:222px; background:var(--seca-display-bg)}
+  .max{position:absolute; left:16px; top:12px; font-size:13px; font-weight:500; color:var(--seca-passive-grey)}
+  .hold{position:absolute; right:16px; top:60px; width:24px; height:24px; color:var(--seca-text-primary)}
+  .big{position:absolute; right:74px; top:22px; font-size:106px; line-height:1; font-weight:600;
+    color:var(--seca-text-primary); letter-spacing:-2px}
+  .unit{position:absolute; right:20px; top:75px; font-size:24px; font-weight:500; color:var(--seca-text-primary)}
+  .net{position:absolute; right:20px; top:117px; font-size:24px; font-weight:500; color:var(--seca-passive-grey)}
+  /* Tara-Reihe */
+  .tarerow{position:absolute; left:16px; bottom:76px; display:flex; gap:12px; align-items:center}
+  .reweight{width:54px; height:36px; background:var(--seca-blue); border-radius:30px;
+    display:flex; align-items:center; justify-content:center; color:var(--seca-text-primary)}
+  .tarepill{width:180px; height:36px; background:var(--seca-blue); border-radius:80px;
+    display:flex; align-items:center; padding-left:8px; gap:8px; color:var(--seca-text-primary)}
+  .tarepill .ticon{width:24px; height:24px; flex:none}
+  .tarepill .tval{flex:1; text-align:center; font-size:20px; font-weight:500}
+  .tarepill .tx{width:24px; height:24px; flex:none}
+  /* BMI/BSA Einblendung */
+  .bmiline{position:absolute; left:0; width:480px; top:96px; text-align:center;
+    font-size:20px; font-weight:500; color:var(--seca-passive-grey); opacity:0}
+  /* Button-Bar */
+  .buttonbar{position:absolute; left:8px; top:208px; width:464px; height:56px;
+    background:var(--seca-white); border:1px solid var(--seca-display-bg);
+    border-radius:8px; box-shadow:0 2px 6px rgba(25,28,36,.18); display:flex; overflow:hidden}
+  .btn{width:107px; height:48px; margin:4px; border-radius:4px; background:var(--seca-white);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    padding-bottom:6px; gap:2px}
+  .btn.send{background:var(--seca-green-bg)}
+  .btn .bico{width:48px; height:26px; display:flex; align-items:center; justify-content:center; color:var(--seca-text-primary)}
+  .btn.send .bico{color:var(--seca-green)}
+  .btn .blabel{font-size:13px; font-weight:500; color:var(--seca-btn-grey)}
+  .btn.send .blabel{color:var(--seca-green)}
+
+  .note{font-size:11px; color:var(--ink-faint); max-width:500px; text-align:center; line-height:1.5}
+
+  /* ---------- CONTROL PANEL ---------- */
+  .panel{width:320px; background:var(--panel); border:1px solid var(--panel-line);
+    border-radius:var(--radius); padding:22px 22px 26px}
+  .panel h2{margin:0 0 20px; font-size:12px; letter-spacing:.14em; font-weight:600;
+    color:var(--accent); text-transform:uppercase}
+  .grp{margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid var(--panel-line)}
+  .grp:last-child{border-bottom:none; margin-bottom:0; padding-bottom:0}
+  .grp-label{font-size:11px; letter-spacing:.1em; color:var(--ink-faint); text-transform:uppercase; margin:0 0 12px}
+  .row{display:flex; align-items:center; justify-content:space-between; margin:11px 0; font-size:14px}
+  .row.dim{color:var(--ink-faint)}
+  .sw{position:relative; width:42px; height:22px; flex:none}
+  .sw input{opacity:0; width:100%; height:100%; margin:0; cursor:pointer}
+  .sw span{position:absolute; inset:0; background:var(--field); border-radius:22px; transition:.2s; pointer-events:none}
+  .sw span::after{content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; background:#fff; border-radius:50%; transition:.2s}
+  .sw input:checked+span{background:var(--accent)}
+  .sw input:checked+span::after{transform:translateX(20px)}
+  .sw.disabled span{opacity:.4}
+  .radio{display:flex; align-items:center; gap:10px; margin:9px 0; font-size:14px; cursor:pointer}
+  .radio input{appearance:none; width:16px; height:16px; border:2px solid var(--ink-faint); border-radius:50%; margin:0; flex:none; transition:.15s; cursor:pointer}
+  .radio input:checked{border-color:var(--accent)}
+  .radio input:checked::after{content:""; display:block; width:8px; height:8px; margin:2px; background:var(--accent); border-radius:50%}
+  .radio.dim{color:var(--ink-faint)}
+  .field-label{font-size:11px; letter-spacing:.08em; color:var(--ink-faint); text-transform:uppercase; margin:14px 0 6px}
+  .field-label.dim{opacity:.5}
+  input[type=text]{width:100%; background:var(--field); border:1px solid var(--panel-line); color:var(--ink); border-radius:8px; padding:10px 12px; font-size:14px; font-family:inherit}
+  input[type=text]:focus{outline:none; border-color:var(--accent)}
+  input[type=text]:disabled{opacity:.4}
+  .zoom-row{display:flex; justify-content:space-between; font-size:11px; color:var(--ink-faint); margin-top:4px}
+  input[type=range]{width:100%; accent-color:var(--accent); margin:8px 0 0}
+  .reset{width:100%; margin-top:20px; background:var(--field); color:var(--ink); border:1px solid var(--panel-line); border-radius:10px; padding:12px; font-size:14px; cursor:pointer; transition:.15s}
+  .reset:hover{background:#343a45}
+</style>
+</head>
+<body>
+
+  <!-- ============ SCREEN ============ -->
+  <div class="stage">
+    <div class="badge">Landscape 480×272 — CORELINE Display</div>
+    <div class="screen-wrap seca-font" id="screen-wrap">
+      <div class="display">
+        <!-- Statusbar -->
+        <div class="statusbar">
+          <svg class="menu" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+          <svg class="wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8.5a15 15 0 0 1 20 0"/><path d="M5 12a10 10 0 0 1 14 0"/><path d="M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
+        </div>
+
+        <!-- Weight-Zone -->
+        <div class="weightzone">
+          <div class="max" id="ov-max">Max 500 kg</div>
+          <svg class="hold" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="7" width="12" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          <div class="big" id="ov-weight">54.8</div>
+          <div class="unit" id="ov-unit">kg</div>
+          <div class="net" id="ov-net">Net</div>
+          <div class="bmiline" id="ov-bmi"></div>
+
+          <!-- Tara-Reihe -->
+          <div class="tarerow" id="ov-tarerow">
+            <div class="reweight">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 6a6 6 0 0 0-6 6H3l4 4 4-4H8a4 4 0 1 1 4 4v2a6 6 0 1 0 0-12z"/></svg>
+            </div>
+            <div class="tarepill">
+              <svg class="ticon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 8l4-3v2h8V5l4 3-4 3v-2H8v2z"/></svg>
+              <span class="tval" id="ov-tare">-12.0 kg</span>
+              <svg class="tx" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Button-Bar -->
+        <div class="buttonbar">
+          <div class="btn">
+            <div class="bico"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M4 8l4-3v2h8V5l4 3-4 3v-2H8v2z"/></svg></div>
+            <div class="blabel">TARE</div>
+          </div>
+          <div class="btn">
+            <div class="bico"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/></svg></div>
+            <div class="blabel">RECALL</div>
+          </div>
+          <div class="btn">
+            <div class="bico"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-4"/><path d="M8 16h2"/></svg></div>
+            <div class="blabel" id="ov-btn-bmi">BMI</div>
+          </div>
+          <div class="btn send">
+            <div class="bico"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 20V4l18 8z"/></svg></div>
+            <div class="blabel">SEND</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note">Aufgebaut mit den echten seca-Tokens aus der CORELINE-Datei (Noto Sans, #191C24, #98B0D8, #06A94E, 106px SemiBold Zahl). Die vier Werte Zahl · Einheit · Net/Gross · Tara rechnen live.</p>
+  </div>
+
+  <!-- ============ CONTROL PANEL ============ -->
+  <div class="panel">
+    <h2>Prototype Controls</h2>
+    <div class="grp">
+      <div class="row dim">Height Required<label class="sw disabled"><input type="checkbox" id="c-height-req"><span></span></label></div>
+      <div class="row">Stand Alone<label class="sw"><input type="checkbox" id="c-standalone" checked><span></span></label></div>
+      <div class="row">Imperial (kg → lbs)<label class="sw"><input type="checkbox" id="c-imperial"><span></span></label></div>
+      <div class="row">BMI / BSA Display<label class="sw"><input type="checkbox" id="c-bmi-display" checked><span></span></label></div>
+    </div>
+    <div class="grp">
+      <p class="grp-label">Height Mode</p>
+      <label class="radio dim"><input type="radio" name="hmode" value="ultra" checked disabled>Ultraschall</label>
+      <label class="radio dim"><input type="radio" name="hmode" value="man" disabled>Manuell</label>
+      <label class="radio dim"><input type="radio" name="hmode" value="takt" disabled>Taktil</label>
+    </div>
+    <div class="grp">
+      <p class="grp-label">Login Mode</p>
+      <label class="radio"><input type="radio" name="login" value="patient" checked>Patient Only</label>
+      <label class="radio"><input type="radio" name="login" value="user">User Only</label>
+      <label class="radio"><input type="radio" name="login" value="both">Both</label>
+    </div>
+    <div class="grp">
+      <p class="grp-label">BMI / BSA Mode</p>
+      <label class="radio"><input type="radio" name="bmimode" value="bmi" checked>BMI</label>
+      <label class="radio"><input type="radio" name="bmimode" value="dubois">Du Bois (BSA)</label>
+      <label class="radio"><input type="radio" name="bmimode" value="haycock">Haycock (BSA)</label>
+      <label class="radio"><input type="radio" name="bmimode" value="mosteller">Mosteller (BSA)</label>
+    </div>
+    <div class="grp">
+      <p class="field-label">Test Weight (kg)</p>
+      <input type="text" id="c-weight" value="86,0">
+      <p class="field-label">Tare (kg)</p>
+      <input type="text" id="c-tare" value="12,0">
+      <p class="field-label" id="lbl-height">Test Height (cm)</p>
+      <input type="text" id="c-height" value="167,7">
+    </div>
+    <div class="grp">
+      <p class="field-label" id="zoom-label">Zoom: 100%</p>
+      <input type="range" id="c-zoom" min="50" max="150" value="100">
+      <div class="zoom-row"><span>50%</span><span>150%</span></div>
+    </div>
+    <button class="reset" onclick="resetAll()">Reset</button>
+  </div>
+
+<script>
+  const KG_TO_LBS = 2.2046226218;
+  const num = v => parseFloat(String(v).replace(",", ".")) || 0;
+  const fmt = (v, d=1) => v.toFixed(d);
+  const $ = id => document.getElementById(id);
+
+  function recompute(){
+    const imperial = $("c-imperial").checked;
+    const showBMI  = $("c-bmi-display").checked;
+    const bmiMode  = document.querySelector('input[name="bmimode"]:checked').value;
+
+    const weightKg = num($("c-weight").value);
+    const tareKg   = num($("c-tare").value);
+    const heightCm = num($("c-height").value);
+    const netKg    = weightKg - tareKg;
+
+    let displayVal, unit, tareDisp;
+    if(imperial){ displayVal = netKg*KG_TO_LBS; tareDisp = tareKg*KG_TO_LBS; unit="lbs"; }
+    else { displayVal = netKg; tareDisp = tareKg; unit="kg"; }
+
+    $("ov-weight").textContent = fmt(displayVal,1);
+    $("ov-unit").textContent   = unit;
+    $("ov-net").textContent    = tareKg > 0 ? "Net" : "Gross";
+    $("ov-max").textContent    = imperial ? "Max 1102 lbs" : "Max 500 kg";
+
+    if(tareKg > 0){
+      $("ov-tarerow").style.opacity = "1";
+      $("ov-tare").textContent = "-" + fmt(tareDisp,1) + " " + unit;
+    } else {
+      $("ov-tarerow").style.opacity = "0";
+    }
+
+    if(showBMI && heightCm > 0){
+      const hM = heightCm/100;
+      let label;
+      if(bmiMode==="bmi"){ label = "BMI " + (weightKg/(hM*hM)).toFixed(1); }
+      else {
+        let bsa;
+        if(bmiMode==="dubois")    bsa = 0.007184*Math.pow(weightKg,0.425)*Math.pow(heightCm,0.725);
+        if(bmiMode==="haycock")   bsa = 0.024265*Math.pow(weightKg,0.5378)*Math.pow(heightCm,0.3964);
+        if(bmiMode==="mosteller") bsa = Math.sqrt(weightKg*heightCm/3600);
+        label = "BSA " + bsa.toFixed(2) + " m²";
+      }
+      $("ov-bmi").textContent = label;
+      $("ov-bmi").style.opacity = "1";
+      $("ov-btn-bmi").textContent = bmiMode==="bmi" ? "BMI" : "BSA";
+    } else {
+      $("ov-bmi").style.opacity = "0";
+    }
+
+    $("c-height").disabled = !showBMI;
+    $("lbl-height").classList.toggle("dim", !showBMI);
+  }
+
+  $("c-zoom").addEventListener("input", e => {
+    const z = e.target.value;
+    $("zoom-label").textContent = "Zoom: " + z + "%";
+    $("screen-wrap").style.transform = "scale(" + (z/100) + ")";
+  });
+
+  function resetAll(){
+    $("c-standalone").checked = true;
+    $("c-imperial").checked = false;
+    $("c-bmi-display").checked = true;
+    document.querySelector('input[name="login"][value="patient"]').checked = true;
+    document.querySelector('input[name="bmimode"][value="bmi"]').checked = true;
+    $("c-weight").value = "86,0";
+    $("c-tare").value = "12,0";
+    $("c-height").value = "167,7";
+    $("c-zoom").value = 100; $("zoom-label").textContent = "Zoom: 100%";
+    $("screen-wrap").style.transform = "scale(1)";
+    recompute();
+  }
+
+  document.querySelectorAll("input").forEach(el => {
+    el.addEventListener("input", recompute);
+    el.addEventListener("change", recompute);
+  });
+  recompute();
+</script>
+</body>
+</html>

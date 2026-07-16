@@ -63,9 +63,6 @@
   .tarepill .ticon{width:24px; height:24px; flex:none}
   .tarepill .tval{flex:1; text-align:center; font-size:20px; font-weight:500}
   .tarepill .tx{width:24px; height:24px; flex:none}
-  /* BMI/BSA Einblendung */
-  .bmiline{position:absolute; left:0; width:480px; top:96px; text-align:center;
-    font-size:20px; font-weight:500; color:var(--seca-passive-grey); opacity:0}
   /* Button-Bar */
   .buttonbar{position:absolute; left:8px; top:208px; width:464px; height:56px;
     background:var(--seca-white); border:1px solid var(--seca-display-bg);
@@ -137,7 +134,6 @@
           <div class="big" id="ov-weight">54.8</div>
           <div class="unit" id="ov-unit">kg</div>
           <div class="net" id="ov-net">Net</div>
-          <div class="bmiline" id="ov-bmi"></div>
 
           <!-- Tara-Reihe -->
           <div class="tarerow" id="ov-tarerow">
@@ -252,23 +248,8 @@
       $("ov-tarerow").style.opacity = "0";
     }
 
-    if(showBMI && heightCm > 0){
-      const hM = heightCm/100;
-      let label;
-      if(bmiMode==="bmi"){ label = "BMI " + (weightKg/(hM*hM)).toFixed(1); }
-      else {
-        let bsa;
-        if(bmiMode==="dubois")    bsa = 0.007184*Math.pow(weightKg,0.425)*Math.pow(heightCm,0.725);
-        if(bmiMode==="haycock")   bsa = 0.024265*Math.pow(weightKg,0.5378)*Math.pow(heightCm,0.3964);
-        if(bmiMode==="mosteller") bsa = Math.sqrt(weightKg*heightCm/3600);
-        label = "BSA " + bsa.toFixed(2) + " m²";
-      }
-      $("ov-bmi").textContent = label;
-      $("ov-bmi").style.opacity = "1";
-      $("ov-btn-bmi").textContent = bmiMode==="bmi" ? "BMI" : "BSA";
-    } else {
-      $("ov-bmi").style.opacity = "0";
-    }
+    // BMI-Button-Label folgt dem gewählten Modus (BMI vs. BSA)
+    $("ov-btn-bmi").textContent = (showBMI && bmiMode !== "bmi") ? "BSA" : "BMI";
 
     $("c-height").disabled = !showBMI;
     $("lbl-height").classList.toggle("dim", !showBMI);

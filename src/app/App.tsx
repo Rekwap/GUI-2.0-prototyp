@@ -30,7 +30,6 @@ import IntegrationInfo from "./components/IntegrationInfo";
 import Network from "./components/Network";
 import ServerConnection from "./components/ServerConnection";
 import TactileHeight from "./components/TactileHeight";
-import UltrasonicHeightMeasurement from "./components/UltrasonicHeightMeasurement";
 import HeightConfirmation from "./components/HeightConfirmation";
 import TactileHeightMeasurementComplete from "./components/TactileHeightMeasurementComplete";
 import ControlPanel from "./components/ControlPanel";
@@ -41,7 +40,6 @@ import ProgressHeigthMeasurementIcon from "./imports/ProgressHeigthMeasurement";
 import ProgressHeigthMeasurementMid from "./imports/ProgressHeigthMeasurement-90-280";
 import ProgressHeigthMeasurementTop from "./imports/ProgressHeigthMeasurement-90-317";
 import DataSaved from "./imports/ScanPatientId-99-680";
-import HeightMeasurementOngoing from "./imports/ScanPatientId-148-1041";
 import { BmiSettingsProvider, useBmiSettings } from './contexts/BmiSettingsContext';
 import MenuComponent from './imports/Menu';
 import InfoComponent from './imports/Info';
@@ -789,9 +787,6 @@ function AppContent() {
   // Height measurement mode: 'manual' | 'ultrasonic' | 'tactile'
   const [heightMode, setHeightMode] = useState<'manual' | 'ultrasonic' | 'tactile'>('ultrasonic');
   
-  // Alternative workflow for ultrasonic height measurement
-  const [ultrasonicAlternativeWorkflow, setUltrasonicAlternativeWorkflow] = useState(false);
-  
   // Zoom level for iPad display (50-150%)
   const [zoomLevel, setZoomLevel] = useState(100);
   
@@ -863,9 +858,6 @@ function AppContent() {
   
   // Height required prompt screen state
   const [showHeightRequiredPrompt, setShowHeightRequiredPrompt] = useState(false);
-  
-  // Ultrasonic height measurement screen state (from height required prompt)
-  const [showUltrasonicHeightMeasurement, setShowUltrasonicHeightMeasurement] = useState(false);
   
   // Height confirmation screen state
   const [showHeightConfirmation, setShowHeightConfirmation] = useState(false);
@@ -1016,31 +1008,27 @@ function AppContent() {
       setShowTactileHeight(true);
     } else {
       // Ultrasonic mode
-      if (ultrasonicAlternativeWorkflow) {
-        // Alternative workflow: Show UltrasonicHeightMeasurement screen
-        setShowUltrasonicHeightMeasurement(true);
-      } else {
-        // Standard workflow: Start the height measurement with animation
-        setHeightMeasured(true);
-        setIsHeightUpdating(true);
+      // Standard workflow: Start the height measurement with animation
+      setHeightMeasured(true);
+      setIsHeightUpdating(true);
+      setHeightLoadingBars(0);
+      
+      // Animate bars sequentially - repeat animation twice
+      // First cycle
+      setTimeout(() => setHeightLoadingBars(1), 300);
+      setTimeout(() => setHeightLoadingBars(2), 600);
+      // Second cycle (repeat)
+      setTimeout(() => setHeightLoadingBars(0), 900);
+      setTimeout(() => setHeightLoadingBars(1), 1200);
+      setTimeout(() => setHeightLoadingBars(2), 1500);
+      
+      // After 1800ms, show the height value
+      setTimeout(() => {
+        setHeightValue(testHeight); // Set the measured height from Control Panel
+        setIsHeightUpdating(false);
         setHeightLoadingBars(0);
-        
-        // Animate bars sequentially - repeat animation twice
-        // First cycle
-        setTimeout(() => setHeightLoadingBars(1), 300);
-        setTimeout(() => setHeightLoadingBars(2), 600);
-        // Second cycle (repeat)
-        setTimeout(() => setHeightLoadingBars(0), 900);
-        setTimeout(() => setHeightLoadingBars(1), 1200);
-        setTimeout(() => setHeightLoadingBars(2), 1500);
-        
-        // After 1800ms, show the height value
-        setTimeout(() => {
-          setHeightValue(testHeight); // Set the measured height from Control Panel
-          setIsHeightUpdating(false);
-          setHeightLoadingBars(0);
-        }, 1800);
-      }
+      }, 1800);
+    
     }
   };
 
@@ -1064,30 +1052,26 @@ function AppContent() {
       setShowTactileHeight(true);
     } else {
       // Ultrasonic mode
-      if (ultrasonicAlternativeWorkflow) {
-        // Alternative workflow: Show fullscreen UltrasonicHeightMeasurement screen
-        setShowUltrasonicHeightMeasurement(true);
-      } else {
-        // Standard workflow: Start the loading animation - repeat the measurement animation
-        setIsHeightUpdating(true);
+      // Standard workflow: Start the loading animation - repeat the measurement animation
+      setIsHeightUpdating(true);
+      setHeightLoadingBars(0);
+      
+      // Animate bars sequentially - repeat animation twice
+      // First cycle
+      setTimeout(() => setHeightLoadingBars(1), 300);
+      setTimeout(() => setHeightLoadingBars(2), 600);
+      // Second cycle (repeat)
+      setTimeout(() => setHeightLoadingBars(0), 900);
+      setTimeout(() => setHeightLoadingBars(1), 1200);
+      setTimeout(() => setHeightLoadingBars(2), 1500);
+      
+      // After 1800ms, show the height value again
+      setTimeout(() => {
+        setIsHeightUpdating(false);
         setHeightLoadingBars(0);
-        
-        // Animate bars sequentially - repeat animation twice
-        // First cycle
-        setTimeout(() => setHeightLoadingBars(1), 300);
-        setTimeout(() => setHeightLoadingBars(2), 600);
-        // Second cycle (repeat)
-        setTimeout(() => setHeightLoadingBars(0), 900);
-        setTimeout(() => setHeightLoadingBars(1), 1200);
-        setTimeout(() => setHeightLoadingBars(2), 1500);
-        
-        // After 1800ms, show the height value again
-        setTimeout(() => {
-          setIsHeightUpdating(false);
-          setHeightLoadingBars(0);
-          // Height value stays the same (167.7) but the animation gives visual feedback
-        }, 800);
-      }
+        // Height value stays the same (167.7) but the animation gives visual feedback
+      }, 800);
+    
     }
   };
 
@@ -1274,34 +1258,30 @@ function AppContent() {
         setShowTactileHeight(true);
       } else {
         // Ultrasonic mode
-        if (ultrasonicAlternativeWorkflow) {
-          // Alternative workflow: Show UltrasonicHeightMeasurement screen
-          setShowUltrasonicHeightMeasurement(true);
-        } else {
-          // Standard workflow: Start the height measurement with animation
-          setHeightMeasured(true);
-          setIsHeightUpdating(true);
+        // Standard workflow: Start the height measurement with animation
+        setHeightMeasured(true);
+        setIsHeightUpdating(true);
+        setHeightLoadingBars(0);
+        
+        // Animate bars sequentially - repeat animation twice
+        // First cycle
+        setTimeout(() => setHeightLoadingBars(1), 300);
+        setTimeout(() => setHeightLoadingBars(2), 600);
+        // Second cycle (repeat)
+        setTimeout(() => setHeightLoadingBars(0), 900);
+        setTimeout(() => setHeightLoadingBars(1), 1200);
+        setTimeout(() => setHeightLoadingBars(2), 1500);
+        
+        // After 1800ms, show the height value and automatically show overview
+        setTimeout(() => {
+          setHeightValue(testHeight);
+          setIsHeightUpdating(false);
           setHeightLoadingBars(0);
-          
-          // Animate bars sequentially - repeat animation twice
-          // First cycle
-          setTimeout(() => setHeightLoadingBars(1), 300);
-          setTimeout(() => setHeightLoadingBars(2), 600);
-          // Second cycle (repeat)
-          setTimeout(() => setHeightLoadingBars(0), 900);
-          setTimeout(() => setHeightLoadingBars(1), 1200);
-          setTimeout(() => setHeightLoadingBars(2), 1500);
-          
-          // After 1800ms, show the height value and automatically show overview
-          setTimeout(() => {
-            setHeightValue(testHeight);
-            setIsHeightUpdating(false);
-            setHeightLoadingBars(0);
-            // Automatically show overview after height measurement completes
-            setPendingSendAfterHeight(false);
-            setShowOverview(true);
-          }, 1800);
-        }
+          // Automatically show overview after height measurement completes
+          setPendingSendAfterHeight(false);
+          setShowOverview(true);
+        }, 1800);
+      
       }
       return;
     }
@@ -1544,30 +1524,8 @@ function AppContent() {
       setShowTactileHeight(true);
     } else {
       // Ultrasonic mode
-      if (ultrasonicAlternativeWorkflow) {
-        setShowUltrasonicHeightMeasurement(true);
-      } else {
-        handleHeightClick();
-      }
-    }
-  };
-
-  const handleUltrasonicHeightMeasurementContinue = (height: string) => {
-    setHeightValue(height);
-    setHeightMeasured(true);
-    setShowUltrasonicHeightMeasurement(false);
-    // Show height confirmation
-    setShowHeightConfirmation(true);
-  };
-
-  const handleUltrasonicHeightMeasurementCancel = () => {
-    setShowUltrasonicHeightMeasurement(false);
-    setPendingSendAfterHeight(false); // Reset pending state
+      handleHeightClick();
     
-    // If no weight is present, show height required prompt again
-    const hasWeight = parseFloat(rawWeight) > 0;
-    if (!hasWeight && heightRequired) {
-      setShowHeightRequiredPrompt(true);
     }
   };
 
@@ -1607,12 +1565,9 @@ function AppContent() {
     setHeightMeasured(false);
     setHeightValue(null);
     // Show ultrasonic height measurement again
-    if (ultrasonicAlternativeWorkflow) {
-      setShowUltrasonicHeightMeasurement(true);
-    } else {
-      // Standard workflow: Start the height measurement with animation
-      handleHeightClick();
-    }
+    // Standard workflow: Start the height measurement with animation
+    handleHeightClick();
+  
   };
 
   // Show different screens based on state
@@ -1740,8 +1695,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-menu"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1782,8 +1735,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-calibration"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1824,8 +1775,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-integration"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1868,8 +1817,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-network"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1914,8 +1861,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-server"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1958,8 +1903,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-tactile"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2002,52 +1945,7 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-tactile-complete"
-            onReset={handleReset}
-            zoomLevel={zoomLevel}
-            onZoomLevelChange={setZoomLevel}
-          />
-        )}
-      </div>
-    );
-  }
-
-  if (showUltrasonicHeightMeasurement) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
-        <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
-          data-name="Ultrasonic Height Measurement"
-          style={{ 
-            transform: `scale(${zoomLevel / 100})`,
-            transformOrigin: 'center center'
-          }}
-        >
-          <HeightMeasurementOngoing 
-            onClose={handleUltrasonicHeightMeasurementCancel}
-            onMeasured={handleUltrasonicHeightMeasurementContinue}
-            targetHeight={testHeight}
-          />
-        </div>
-        {showControlPanel && (
-          <ControlPanel 
-            heightMode={heightMode}
-            onHeightModeChange={setHeightMode}
-            heightRequired={heightRequired}
-            onHeightRequiredChange={setHeightRequired}
-            installationMode={installationMode}
-            onInstallationModeChange={setInstallationMode}
-            isMetric={isMetric}
-            onIsMetricChange={setIsMetric}
-            loginMode={loginMode}
-            onLoginModeChange={setLoginMode}
-            testHeight={testHeight}
-            onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
-            uniqueId="-ultrasonic"
             onReset={handleReset}
             zoomLevel={zoomLevel}
             onZoomLevelChange={setZoomLevel}
@@ -2090,8 +1988,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-confirmation"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2153,8 +2049,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-tare"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2197,8 +2091,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-manual-tare"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2242,8 +2134,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-manual-height"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2284,8 +2174,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-height-required"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2323,8 +2211,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-scan-patient"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2362,8 +2248,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-patient-id"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2401,8 +2285,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-scan-user"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2440,8 +2322,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-user-id"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2484,8 +2364,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-both-ids"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2531,8 +2409,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-overview"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2570,8 +2446,6 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
-            ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-            onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
             uniqueId="-data-saved"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2699,8 +2573,6 @@ function AppContent() {
           onLoginModeChange={setLoginMode}
           testHeight={testHeight}
           onTestHeightChange={setTestHeight}
-          ultrasonicAlternativeWorkflow={ultrasonicAlternativeWorkflow}
-          onUltrasonicAlternativeWorkflowChange={setUltrasonicAlternativeWorkflow}
           uniqueId="-main"
           onReset={handleReset}
           zoomLevel={zoomLevel}

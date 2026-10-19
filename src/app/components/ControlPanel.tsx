@@ -16,8 +16,6 @@ interface ControlPanelProps {
   onLoginModeChange: (mode: 'user-only' | 'patient-only' | 'both') => void;
   testHeight: string;
   onTestHeightChange: (height: string) => void;
-  ultrasonicAlternativeWorkflow: boolean;
-  onUltrasonicAlternativeWorkflowChange: (enabled: boolean) => void;
   uniqueId?: string;
   onReset?: () => void;
   zoomLevel?: number;
@@ -37,8 +35,6 @@ export default function ControlPanel({
   onLoginModeChange,
   testHeight,
   onTestHeightChange,
-  ultrasonicAlternativeWorkflow,
-  onUltrasonicAlternativeWorkflowChange,
   uniqueId = '',
   onReset,
   zoomLevel = 100,
@@ -60,10 +56,6 @@ export default function ControlPanel({
           <div className="flex items-center space-x-2">
             <Switch id={`unit-system${uniqueId}`} checked={!isMetric} onCheckedChange={(checked) => onIsMetricChange(!checked)} />
             <Label htmlFor={`unit-system${uniqueId}`}>Imperial (lbs / ft'in)</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Switch id={`ultrasonic-alt-workflow${uniqueId}`} checked={ultrasonicAlternativeWorkflow} onCheckedChange={onUltrasonicAlternativeWorkflowChange} />
-            <Label htmlFor={`ultrasonic-alt-workflow${uniqueId}`}>Ultrasonic Alt. Workflow</Label>
           </div>
         </div>
 

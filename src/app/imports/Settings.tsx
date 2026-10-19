@@ -40,7 +40,7 @@ export default function Settings({
       onClick: onNetworkClick
     },
     {
-      label: 'RS232',
+      label: 'RS-232',
       onClick: onRS232Click
     },
     {
@@ -52,7 +52,7 @@ export default function Settings({
       onClick: onAudioClick
     },
     {
-      label: 'Battery',
+      label: 'Battery Pack',
       onClick: onBatteryClick
     },
     {

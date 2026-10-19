@@ -51,6 +51,9 @@ import DisplayComponent from './imports/Display';
 import LanguageComponent from './imports/Language';
 import DialogRestartComponent from './imports/DialogRestart';
 import BmiBsaMenu from './components/BmiBsaMenu';
+import { MainScreen, type HeightPanelProps, type LoginBanner } from './main-screen/MainScreen';
+import { TareAssistant } from './flows/TareAssistant';
+import { RecallScreen, ScanIdScreen, IdConfirmedScreen, OverviewScreen, TransmittingScreen, DataSavedScreen } from './flows/SendFlow';
 
 // Wrapper component for consistent layout
 function ScreenWrapper({ children, controls }: { children: React.ReactNode; controls: React.ReactNode}) {
@@ -774,6 +777,8 @@ function AppContent() {
   const [preTareValues, setPreTareValues] = useState<string[]>([]);
   const [showManualTare, setShowManualTare] = useState(false);
   const [showTareInfo, setShowTareInfo] = useState(false);
+  // Mother/Child tare active (shows the mother/child icon on the main screen)
+  const [motherMode, setMotherMode] = useState(false);
   const [heightRequired, setHeightRequired] = useState(true); // Control whether height is required for sending
   const [isHeightUpdating, setIsHeightUpdating] = useState(false);
   const [heightLoadingBars, setHeightLoadingBars] = useState(0);
@@ -867,6 +872,9 @@ function AppContent() {
   
   // Data saved screen state
   const [showDataSaved, setShowDataSaved] = useState(false);
+  const [showTransmitting, setShowTransmitting] = useState(false);
+  // Last sent measurement, shown by RECALL
+  const [lastSent, setLastSent] = useState<{ weightKg: number; tareKg: number; time: number } | null>(null);
   
   // Track if we should show overview after height measurement (when triggered from Send button)
   const [pendingSendAfterHeight, setPendingSendAfterHeight] = useState(false);
@@ -1227,6 +1235,7 @@ function AppContent() {
   const handleRemoveTare = () => {
     setTaredWeight(null);
     setPreTareValues([]);
+    setMotherMode(false);
     
     // Reset weight to raw weight
     const displayWeight = isMetric ? parseFloat(rawWeight) : kgToLbs(parseFloat(rawWeight));
@@ -1311,12 +1320,16 @@ function AppContent() {
 
   const handleOverviewSend = () => {
     setShowOverview(false);
-    setShowDataSaved(true);
-    
-    // Hide DataSaved after 2 seconds
+    // Remember the sent values for RECALL
+    const tareKg = preTareValues.reduce((sum, v) => sum + parseFloat(v), 0) + (taredWeight ? parseFloat(taredWeight) : 0);
+    setLastSent({ weightKg: parseFloat(rawWeight) - tareKg, tareKg, time: Date.now() });
+    // Transmitting data ... → Data saved → main screen
+    setShowTransmitting(true);
     setTimeout(() => {
-      setShowDataSaved(false);
-    }, 2000);
+      setShowTransmitting(false);
+      setShowDataSaved(true);
+      setTimeout(() => setShowDataSaved(false), 2000);
+    }, 1500);
   };
 
   const handleLogout = () => {
@@ -1485,6 +1498,7 @@ function AppContent() {
 
   const handleReset = () => {
     setWeight('0.00');
+    setMotherMode(false);
     setRawWeight('0.00');
     setHeightMeasured(false);
     setHeightValue(null);
@@ -1606,7 +1620,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Menu"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -1742,7 +1756,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Height Calibration"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -1784,7 +1798,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Integration Info"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -1826,7 +1840,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Network"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -1870,7 +1884,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Server Connection"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -1916,7 +1930,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Tactile Height"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -1960,7 +1974,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Tactile Height Complete"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -2004,7 +2018,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Ultrasonic Height Measurement"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -2047,7 +2061,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Height Confirmation"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -2092,42 +2106,37 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Tare Assistant"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
             transformOrigin: 'center center'
           }}
         >
-          <PreTare 
+          <TareAssistant
+            isMetric={isMetric}
             onBack={handleTareBack}
-            weight={weight}
-            onTareConfirm={handleTareConfirm}
-            onPreTareToggle={(value: string) => {
-              const newValues = preTareValues.includes(value) 
-                ? preTareValues.filter(v => v !== value)
-                : [...preTareValues, value];
-              setPreTareValues(newValues);
-              
-              // Recalculate displayed weight
-              const measuredWeight = parseFloat(rawWeight);
-              const totalPreTare = newValues.reduce((sum, value) => sum + parseFloat(value), 0);
-              const manualTare = taredWeight ? parseFloat(taredWeight) : 0;
-              const totalTare = totalPreTare + manualTare;
-              const netWeight = measuredWeight - totalTare;
-              
-              // Convert to display unit
-              const displayWeight = isMetric ? netWeight : kgToLbs(netWeight);
-              setWeight(displayWeight.toFixed(2));
-              
-              // Close the tare assistant and go back to main screen
+            onTare={handleTareConfirm}
+            onMotherChild={(adultKg, childKg) => {
+              // Adult weight becomes the tare, child stays on the scale (net = child)
+              setTaredWeight(adultKg.toFixed(2));
+              setPreTareValues([]);
+              setRawWeight((adultKg + childKg).toFixed(2));
+              setWeight((isMetric ? childKg : kgToLbs(childKg)).toFixed(2));
+              setMotherMode(true);
+              setShowReweightButton(true);
+              setHasEverMeasured(true);
               setShowTareAssistant(false);
             }}
-            activePreTareValues={preTareValues}
-            onManualTareClick={handleManualTareClick}
-            taredWeight={taredWeight}
-            isMetric={isMetric}
-            onInfoClick={() => setShowTareInfo(true)}
+            onClothing={(valueKg) => {
+              const values = valueKg > 0 ? [valueKg.toFixed(2)] : [];
+              setPreTareValues(values);
+              const manualTare = taredWeight ? parseFloat(taredWeight) : 0;
+              const net = parseFloat(rawWeight) - valueKg - manualTare;
+              setWeight((isMetric ? net : kgToLbs(net)).toFixed(2));
+              setShowTareAssistant(false);
+            }}
+            initialClothingKg={preTareValues.reduce((sum, v) => sum + parseFloat(v), 0)}
           />
         </div>
         {showControlPanel && (
@@ -2160,7 +2169,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Manual Tare"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -2204,7 +2213,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Manual Height Input"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -2249,7 +2258,7 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Height Required"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
@@ -2291,17 +2300,14 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Scan Patient ID"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
             transformOrigin: 'center center'
           }}
         >
-          <ScanPatientId 
-            onConfirm={handleScanPatientIdConfirm}
-            onCancel={handleScanPatientIdCancel}
-          />
+          <ScanIdScreen kind="patient" onScan={handleScanPatientIdConfirm} onCancel={handleScanPatientIdCancel} />
         </div>
         {showControlPanel && (
           <ControlPanel 
@@ -2333,14 +2339,14 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Patient ID Confirmed"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
             transformOrigin: 'center center'
           }}
         >
-          <Id onClose={handlePatientIdNext} onNext={handlePatientIdNext} />
+          <IdConfirmedScreen kind="patient" onNext={handlePatientIdNext} />
         </div>
         {showControlPanel && (
           <ControlPanel 
@@ -2372,17 +2378,14 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Scan User ID"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
             transformOrigin: 'center center'
           }}
         >
-          <ScanPatientId34320 
-            onConfirm={handleScanUserIdConfirm}
-            onCancel={handleScanUserIdCancel}
-          />
+          <ScanIdScreen kind="user" onScan={handleScanUserIdConfirm} onCancel={handleScanUserIdCancel} />
         </div>
         {showControlPanel && (
           <ControlPanel 
@@ -2414,14 +2417,14 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="User ID Confirmed"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
             transformOrigin: 'center center'
           }}
         >
-          <Id34414 onClose={handleUserIdNext} onNext={handleUserIdNext} />
+          <IdConfirmedScreen kind="user" onNext={handleUserIdNext} />
         </div>
         {showControlPanel && (
           <ControlPanel 
@@ -2453,17 +2456,18 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Scan Both IDs"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
             transformOrigin: 'center center'
           }}
         >
-          <ScanBothIds 
-            onConfirm={handleScanBothIdsConfirm}
+          {/* Patient + user: scan the patient ID first, then the user ID */}
+          <ScanIdScreen
+            kind={firstScannedId ? 'user' : 'patient'}
+            onScan={() => handleScanBothIdsConfirm(firstScannedId ? 'user' : 'patient')}
             onCancel={handleScanBothIdsCancel}
-            firstScannedId={firstScannedId}
           />
         </div>
         {showControlPanel && (
@@ -2496,22 +2500,21 @@ function AppContent() {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Overview"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
             transformOrigin: 'center center'
           }}
         >
-          <WeightMeasurement 
+          <OverviewScreen
+            weight={parseFloat(weight).toFixed(2)}
+            height={heightMeasured ? formatHeight(heightValue ?? testHeight) : null}
+            isMetric={isMetric}
+            patient={isPatientLoggedIn}
+            user={isUserLoggedIn}
             onClose={handleOverviewClose}
             onSend={handleOverviewSend}
-            weight={formatWeight(weight)}
-            height={heightValue ? formatHeight(heightValue) : undefined}
-            bmi={bsaValue !== '---' ? bsaValue : undefined}
-            loginMode={loginMode}
-            isMetric={isMetric}
-            displayLabel={getDisplayLabel()}
           />
         </div>
         {showControlPanel && (
@@ -2540,18 +2543,18 @@ function AppContent() {
     );
   }
 
-  if (showDataSaved) {
+  if (showDataSaved || showTransmitting) {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
         <div 
-          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
           data-name="Data Saved"
           style={{ 
             transform: `scale(${zoomLevel / 100})`,
             transformOrigin: 'center center'
           }}
         >
-          <DataSaved />
+          {showTransmitting ? <TransmittingScreen /> : <DataSavedScreen />}
         </div>
         {showControlPanel && (
           <ControlPanel 
@@ -2582,29 +2585,87 @@ function AppContent() {
   return (
     <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
       <div 
-        className="bg-[#e7ebf7] relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0" 
+        className="bg-[#e7ebf7] relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
         data-name="iScale (Portrait)"
         style={{ 
           transform: `scale(${zoomLevel / 100})`,
           transformOrigin: 'center center'
         }}
       >
-        {isUserLoggedIn && isPatientLoggedIn ? (
-          <StatusBarPortraitBoth onLogout={handleLogout} onMenuClick={handleMenuClick} />
-        ) : isUserLoggedIn && !isPatientLoggedIn ? (
-          <StatusBarPortrait34583 onLogout={handleLogout} onMenuClick={handleMenuClick} />
-        ) : (
-          <StatusBarPortrait showPatientBanner={isPatientLoggedIn} onLogout={handleLogout} onMenuClick={handleMenuClick} />
-        )}
-        <LibaryWeightDetails weight={formatWeight(weight)} onWeightClick={handleWeightClick} preTareValues={preTareValues} taredWeight={taredWeight} rawWeight={rawWeight} isMetric={isMetric} isReweighting={isReweighting} />
-        <LibaryHeightBmi showHeightMeasured={heightMeasured} showBsa={showBsa} onHeightClick={handleHeightClick} onBsaClick={handleBsaClick} onBsaBackClick={handleBsaBackClick} heightValue={formatHeight(testHeight)} bsaValue={bsaValue} isHeightUpdating={isHeightUpdating} heightLoadingBars={heightLoadingBars} onHeightValueClick={handleHeightValueClick} isMetric={isMetric} rawWeight={rawWeight} hasEverMeasured={hasEverMeasured} displayLabel={getDisplayLabel()} />
-        <ButtonBar onTareClick={handleTareClick} onSendClick={handleSendClick} onRecallClick={handleRecallClick} isStandalone={installationMode === 'standalone'} />
-        <LibaryTara showButton={showReweightButton} onReweight={handleReweight} taredWeight={taredWeight} preTareValues={preTareValues} onRemoveTare={handleRemoveTare} weight={weight} rawWeight={rawWeight} isMetric={isMetric} isReweighting={isReweighting} />
-        
+        {(() => {
+          // GUI 2.1 main screen (1:1 with Figma handover, see ./main-screen)
+          const totalTare = preTareValues.reduce((sum, v) => sum + parseFloat(v), 0) + (taredWeight ? parseFloat(taredWeight) : 0);
+          const tareText = totalTare === 0 ? null : `-${isMetric ? totalTare.toFixed(2) : kgToLbs(totalTare).toFixed(1)} ${isMetric ? 'kg' : 'lbs'}`;
+          const login: LoginBanner =
+            loginMode === 'both' && (isUserLoggedIn || isPatientLoggedIn)
+              ? { kind: 'both', patientOnline: isPatientLoggedIn, userOnline: isUserLoggedIn }
+              : isUserLoggedIn && isPatientLoggedIn
+                ? { kind: 'both', patientOnline: true, userOnline: true }
+                : isUserLoggedIn
+                  ? { kind: 'user' }
+                  : isPatientLoggedIn
+                    ? { kind: 'patient' }
+                    : { kind: 'none' };
+          const label = getDisplayLabel();
+          const height: HeightPanelProps = !heightMeasured
+            ? { state: 'start', onHeight: handleHeightClick }
+            : isHeightUpdating
+              ? {
+                  state: 'measuring',
+                  indicator: heightLoadingBars === 0 ? <ProgressHeigthMeasurementIcon /> : heightLoadingBars === 1 ? <ProgressHeigthMeasurementMid /> : <ProgressHeigthMeasurementTop />,
+                }
+              : {
+                  state: 'value',
+                  value: formatHeight(heightValue ?? testHeight),
+                  unit: isMetric ? 'cm' : 'ft\'in"',
+                  bmiValue: bsaValue,
+                  bmiLabel: label === 'BSA' ? 'm²' : label,
+                  onReheight: handleHeightValueClick,
+                  onValueClick: handleHeightValueClick,
+                };
+          return (
+            <MainScreen
+              statusBar={{ login, onMenu: handleMenuClick, onLogout: handleLogout }}
+              weight={{
+                state: 'value',
+                value: parseFloat(formatWeight(weight)).toFixed(2),
+                unit: isMetric ? 'kg' : 'lbs',
+                rangeText: isMetric ? 'Max 360 kg' : 'Max 790 lbs',
+                showNet: taredWeight !== null || preTareValues.length > 0,
+                locked: parseFloat(rawWeight) !== 0 && !isReweighting,
+                showBaby: motherMode,
+                onValueClick: handleWeightClick,
+              }}
+              tare={{
+                showReweight: showReweightButton,
+                tareText,
+                calculating: isReweighting && tareText !== null,
+                reweightDisabled: isReweighting,
+                onReweight: handleReweight,
+                onRemoveTare: handleRemoveTare,
+              }}
+              height={height}
+              buttons={{ onTare: handleTareClick, onRecall: handleRecallClick, onConfirm: handleSendClick }}
+            />
+          );
+        })()}
+
         {/* Previous Value Screen Overlay */}
         {showPreviousValue && (
           <div className="absolute inset-0 z-50">
-            <PreviousValueScreen onClose={() => setShowPreviousValue(false)} />
+            {(() => {
+              const tareNow = preTareValues.reduce((sum, v) => sum + parseFloat(v), 0) + (taredWeight ? parseFloat(taredWeight) : 0);
+              const rec = lastSent ?? { weightKg: parseFloat(rawWeight) - tareNow, tareKg: tareNow, time: Date.now() };
+              return (
+                <RecallScreen
+                  weightKg={rec.weightKg}
+                  tareKg={rec.tareKg}
+                  minutesAgo={Math.max(1, Math.round((Date.now() - rec.time) / 60000))}
+                  isMetric={isMetric}
+                  onClose={() => setShowPreviousValue(false)}
+                />
+              );
+            })()}
           </div>
         )}
         

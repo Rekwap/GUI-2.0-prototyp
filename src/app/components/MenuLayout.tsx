@@ -203,7 +203,7 @@ interface PagingProps {
   onNextPage?: () => void;
 }
 
-function ArrowDropDown() {
+function ArrowDropDown({ color = '#8B8D91' }: { color?: string }) {
   return (
     <div className="relative size-[24px]">
       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
@@ -212,7 +212,7 @@ function ArrowDropDown() {
             <rect fill="var(--fill-0, #D9D9D9)" height="23" stroke="var(--stroke-0, black)" width="23" x="0.5" y="0.5" />
           </mask>
           <g mask="url(#mask0_arrow_drop)">
-            <path d="M12 17.95L2 8H22L12 17.95Z" fill="var(--fill-0, #8B8D91)" />
+            <path d="M12 17.95L2 8H22L12 17.95Z" fill={color} />
           </g>
         </g>
       </svg>
@@ -254,7 +254,7 @@ function PagingElement({ currentPage, totalPages, onPrevPage, onNextPage }: Pagi
   };
 
   return (
-    <div className="h-[52px] relative shrink-0 w-[260px]">
+    <div className="absolute h-[52px] left-0 top-[364px] w-[260px]">
       {/* Background */}
       <div className="absolute bg-white inset-0 overflow-clip rounded-bl-[8px] rounded-br-[8px]" />
       
@@ -276,7 +276,7 @@ function PagingElement({ currentPage, totalPages, onPrevPage, onNextPage }: Pagi
           }`}
         >
           <div className="flex-none rotate-[180deg]">
-            <ArrowDropDown />
+            <ArrowDropDown color={currentPage > 1 ? '#191C24' : '#8B8D91'} />
           </div>
         </div>
       </button>
@@ -298,7 +298,7 @@ function PagingElement({ currentPage, totalPages, onPrevPage, onNextPage }: Pagi
             downPressed ? 'opacity-50' : 'opacity-100'
           }`}
         >
-          <ArrowDropDownDark />
+          <div className="flex-none"><ArrowDropDown color={currentPage < totalPages ? '#191C24' : '#8B8D91'} /></div>
         </div>
       </button>
       
@@ -308,7 +308,7 @@ function PagingElement({ currentPage, totalPages, onPrevPage, onNextPage }: Pagi
           {Array.from({ length: totalPages }).map((_, index) => (
             <div 
               key={index}
-              className={`${index === currentPage - 1 ? 'bg-[#191c24]' : 'bg-[#d9d9d9]'} rounded-[4px] shrink-0 size-[8px]`}
+              className={`${index === currentPage - 1 ? 'bg-[#191c24]' : 'bg-[#8b8d91]'} rounded-[4px] shrink-0 size-[8px]`}
             />
           ))}
         </div>
@@ -334,8 +334,18 @@ export interface MenuLayoutProps {
   paging?: PagingProps;
 }
 
-export default function MenuLayout({ title, items, onBack, onHome, paging }: MenuLayoutProps) {
+const ITEMS_PER_PAGE = 7;
+
+export default function MenuLayout({ title, items: allItems, onBack, onHome, paging: externalPaging }: MenuLayoutProps) {
   const [pressedStates, setPressedStates] = useState<Record<number, boolean>>({});
+  // More than 7 entries: page automatically (7 rows + paging row, as in the Figma menus).
+  const [page, setPage] = useState(1);
+  const autoPages = !externalPaging && allItems.length > ITEMS_PER_PAGE ? Math.ceil(allItems.length / ITEMS_PER_PAGE) : 0;
+  const currentPage = Math.min(page, Math.max(1, autoPages));
+  const items = autoPages ? allItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE) : allItems;
+  const paging: PagingProps | undefined = externalPaging ?? (autoPages
+    ? { currentPage, totalPages: autoPages, onPrevPage: () => { setPressedStates({}); setPage(currentPage - 1); }, onNextPage: () => { setPressedStates({}); setPage(currentPage + 1); } }
+    : undefined);
 
   const handlePressStart = (index: number) => {
     setPressedStates(prev => ({ ...prev, [index]: true }));
@@ -377,9 +387,8 @@ export default function MenuLayout({ title, items, onBack, onHome, paging }: Men
             />
           ))}
           
-          {/* Paging Element */}
-          {paging && <PagingElement {...paging} />}
         </div>
+        {paging && <PagingElement {...paging} />}
       </div>
     </div>
   );

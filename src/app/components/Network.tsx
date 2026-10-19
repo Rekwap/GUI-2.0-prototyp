@@ -142,7 +142,7 @@ function MenuItemWithArrow({ label, onClick, disabled }: MenuItemWithArrowProps)
       
       {/* Text */}
       <div className="absolute h-[27px] left-[12px] top-[calc(50%+0.5px)] translate-y-[-50%] w-[182px]">
-        <div className={`absolute flex flex-col font-['Noto_Sans:Display_Medium',_sans-serif] font-medium inset-0 justify-center leading-[0] ${textColor} text-[20px]`} style={{ fontVariationSettings: "'CTGR' 100, 'wdth' 100" }}>
+        <div className={`absolute flex flex-col font-['Noto_Sans:Display_Medium',_sans-serif] font-medium inset-0 justify-center leading-[0] ${textColor} text-[20px] text-left`} style={{ fontVariationSettings: "'CTGR' 100, 'wdth' 100" }}>
           <p className="leading-[normal]">{label}</p>
         </div>
       </div>

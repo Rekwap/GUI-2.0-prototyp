@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import svgPaths from "./imports/svg-3klf9qq62w";
 import taraSvgPaths from "./imports/svg-ghfkmimwkx";
 import heightSvgPaths from "./imports/svg-8ngzldbm4z";
@@ -803,6 +803,19 @@ function AppContent() {
   const [showScanUserId, setShowScanUserId] = useState(false);
   const [showUserIdConfirmed, setShowUserIdConfirmed] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+  // Direct login by barcode scan (outside the send wizard): feedback screen for 3 s, then main screen with banner.
+  const [directLogin, setDirectLogin] = useState<'patient' | 'user' | null>(null);
+  useEffect(() => {
+    if (!directLogin) return;
+    const t = setTimeout(() => setDirectLogin(null), 3000);
+    return () => clearTimeout(t);
+  }, [directLogin]);
+  const handleBarcodeScan = (kind: 'patient' | 'user') => {
+    if (kind === 'patient') setIsPatientLoggedIn(true);
+    else setIsUserLoggedIn(true);
+    setDirectLogin(kind);
+  };
   
   // Both mode flow
   const [showScanBothIds, setShowScanBothIds] = useState(false);
@@ -2184,6 +2197,43 @@ function AppContent() {
     );
   }
 
+  if (directLogin) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
+        <div 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
+          data-name={directLogin === 'patient' ? 'Patient ID Confirmed' : 'User ID Confirmed'}
+          style={{ 
+            transform: `scale(${zoomLevel / 100})`,
+            transformOrigin: 'center center'
+          }}
+        >
+          <IdConfirmedScreen kind={directLogin} onNext={() => setDirectLogin(null)} />
+        </div>
+        {showControlPanel && (
+          <ControlPanel 
+            heightMode={heightMode}
+            onHeightModeChange={setHeightMode}
+            heightRequired={heightRequired}
+            onHeightRequiredChange={setHeightRequired}
+            installationMode={installationMode}
+            onInstallationModeChange={setInstallationMode}
+            isMetric={isMetric}
+            onIsMetricChange={setIsMetric}
+            loginMode={loginMode}
+            onLoginModeChange={setLoginMode}
+            testHeight={testHeight}
+            onTestHeightChange={setTestHeight}
+            uniqueId="-direct-login"
+            onReset={handleReset}
+            zoomLevel={zoomLevel}
+            onZoomLevelChange={setZoomLevel}
+          />
+        )}
+      </div>
+    );
+  }
+
   if (showScanPatientId) {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
@@ -2574,6 +2624,7 @@ function AppContent() {
           testHeight={testHeight}
           onTestHeightChange={setTestHeight}
           uniqueId="-main"
+          onScanBarcode={handleBarcodeScan}
           onReset={handleReset}
           zoomLevel={zoomLevel}
           onZoomLevelChange={setZoomLevel}

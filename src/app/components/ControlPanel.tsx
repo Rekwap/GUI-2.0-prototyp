@@ -20,6 +20,25 @@ interface ControlPanelProps {
   onReset?: () => void;
   zoomLevel?: number;
   onZoomLevelChange?: (zoom: number) => void;
+  /** Simulate a barcode scan (direct login without the send wizard). */
+  onScanBarcode?: (kind: 'patient' | 'user') => void;
+}
+
+function ScanButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      className="ml-auto -my-[2px] flex items-center justify-center size-[20px] rounded-[4px] text-gray-500 hover:text-black hover:bg-gray-300 cursor-pointer"
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <rect x="1" y="2" width="1.5" height="12" /><rect x="3.5" y="2" width="1" height="12" /><rect x="5.5" y="2" width="2" height="12" />
+        <rect x="8.5" y="2" width="1" height="12" /><rect x="10.5" y="2" width="1.5" height="12" /><rect x="13" y="2" width="2" height="12" />
+      </svg>
+    </button>
+  );
 }
 
 export default function ControlPanel({
@@ -38,7 +57,8 @@ export default function ControlPanel({
   uniqueId = '',
   onReset,
   zoomLevel = 100,
-  onZoomLevelChange
+  onZoomLevelChange,
+  onScanBarcode
 }: ControlPanelProps) {
   return (
     <div className="flex flex-col h-[480px] w-[320px] p-6 bg-[rgb(233,233,233)] rounded-lg shadow-md flex-shrink-0 overflow-auto">
@@ -115,6 +135,7 @@ export default function ControlPanel({
                 onChange={() => onLoginModeChange('patient-only')} 
               />
               <Label htmlFor={`login-patient${uniqueId}`}>Patient Only</Label>
+              {onScanBarcode && <ScanButton label="Patient-Barcode scannen" onClick={() => onScanBarcode('patient')} />}
             </div>
             <div className="flex items-center space-x-2">
               <input 
@@ -125,6 +146,7 @@ export default function ControlPanel({
                 onChange={() => onLoginModeChange('user-only')} 
               />
               <Label htmlFor={`login-user${uniqueId}`}>User Only</Label>
+              {onScanBarcode && <ScanButton label="User-Barcode scannen" onClick={() => onScanBarcode('user')} />}
             </div>
             <div className="flex items-center space-x-2">
               <input 

@@ -859,6 +859,8 @@ function AppContent() {
   
   // Test height for display (in cm)
   const [testHeight, setTestHeight] = useState('167.7');
+  // Simulated patient weight in kg (Control Panel).
+  const [testWeight, setTestWeight] = useState('54.80');
   
   // Control Panel visibility (visible by default)
   const [showControlPanel, setShowControlPanel] = useState(true);
@@ -982,11 +984,23 @@ function AppContent() {
     setShowReweightButton(true);
     // Mark that a measurement has been taken
     setHasEverMeasured(true);
-    // Add 54.80 to the current displayed weight
+    // Add the test weight (Control Panel) to the current displayed weight
+    const kg = parseFloat(testWeight) || 0;
     const currentWeight = parseFloat(weight);
-    const newWeight = currentWeight + 54.80;
+    const newWeight = currentWeight + (isMetric ? kg : kgToLbs(kg));
     setWeight(newWeight.toFixed(2));
-    setRawWeight('54.80');
+    setRawWeight(kg.toFixed(2));
+  };
+
+  // Changing the test weight while a patient is on the scale updates the reading live.
+  const handleTestWeightChange = (value: string) => {
+    setTestWeight(value);
+    const kg = parseFloat(value);
+    if (isNaN(kg) || parseFloat(rawWeight) === 0 || taredWeight !== null) return;
+    const totalPreTare = preTareValues.reduce((sum, v) => sum + parseFloat(v), 0);
+    const net = kg - totalPreTare;
+    setRawWeight(kg.toFixed(2));
+    setWeight((isMetric ? net : kgToLbs(net)).toFixed(2));
   };
 
   const handleReweight = () => {
@@ -1707,6 +1721,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-menu"
             onReset={handleReset}
@@ -1747,6 +1763,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-calibration"
             onReset={handleReset}
@@ -1787,6 +1805,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-integration"
             onReset={handleReset}
@@ -1829,6 +1849,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-network"
             onReset={handleReset}
@@ -1873,6 +1895,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-server"
             onReset={handleReset}
@@ -1915,6 +1939,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-tactile"
             onReset={handleReset}
@@ -1957,6 +1983,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-tactile-complete"
             onReset={handleReset}
@@ -2000,6 +2028,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-confirmation"
             onReset={handleReset}
@@ -2061,6 +2091,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-tare"
             onReset={handleReset}
@@ -2103,6 +2135,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-manual-tare"
             onReset={handleReset}
@@ -2146,6 +2180,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-manual-height"
             onReset={handleReset}
@@ -2186,6 +2222,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-height-required"
             onReset={handleReset}
@@ -2223,6 +2261,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-direct-login"
             onReset={handleReset}
@@ -2260,6 +2300,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-scan-patient"
             onReset={handleReset}
@@ -2297,6 +2339,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-patient-id"
             onReset={handleReset}
@@ -2334,6 +2378,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-scan-user"
             onReset={handleReset}
@@ -2371,6 +2417,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-user-id"
             onReset={handleReset}
@@ -2413,6 +2461,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-both-ids"
             onReset={handleReset}
@@ -2458,6 +2508,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-overview"
             onReset={handleReset}
@@ -2495,6 +2547,8 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             uniqueId="-data-saved"
             onReset={handleReset}
@@ -2622,6 +2676,8 @@ function AppContent() {
           loginMode={loginMode}
           onLoginModeChange={setLoginMode}
           testHeight={testHeight}
+          testWeight={testWeight}
+          onTestWeightChange={handleTestWeightChange}
           onTestHeightChange={setTestHeight}
           uniqueId="-main"
           onScanBarcode={handleBarcodeScan}

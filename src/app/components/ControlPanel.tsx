@@ -16,6 +16,8 @@ interface ControlPanelProps {
   onLoginModeChange: (mode: 'user-only' | 'patient-only' | 'both') => void;
   testHeight: string;
   onTestHeightChange: (height: string) => void;
+  testWeight?: string;
+  onTestWeightChange?: (weight: string) => void;
   uniqueId?: string;
   onReset?: () => void;
   zoomLevel?: number;
@@ -54,6 +56,8 @@ export default function ControlPanel({
   onLoginModeChange,
   testHeight,
   onTestHeightChange,
+  testWeight,
+  onTestWeightChange,
   uniqueId = '',
   onReset,
   zoomLevel = 100,
@@ -163,6 +167,22 @@ export default function ControlPanel({
 
         {/* Separator */}
         <div className="border-t" />
+
+        {/* Test Weight Section */}
+        {onTestWeightChange && (
+          <div className="flex flex-col gap-2">
+            <Label htmlFor={`test-weight${uniqueId}`}>Test Weight (kg)</Label>
+            <Input 
+              type="text" 
+              inputMode="decimal"
+              id={`test-weight${uniqueId}`}
+              value={testWeight || ''}
+              onChange={(e) => onTestWeightChange(e.target.value)}
+              placeholder="54.80"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        )}
 
         {/* Test Height Section */}
         <div className="flex flex-col gap-2">

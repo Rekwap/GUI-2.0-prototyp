@@ -1,6 +1,7 @@
 // Start screen "Choose mode" and the self-measurement flow (GUI 2.1, section
-// "07.05.2026"), configuration: integrated, height required, ultrasonic,
-// login patient only, no persistent pre-tare. Screens are 1:1 Figma exports;
+// "07.05.2026" and "23.04.2026_Overview variants" → weight only), configuration:
+// integrated, ultrasonic, login patient only, no persistent pre-tare;
+// "Height Required" switches between the weight + height and the weight-only flow. Screens are 1:1 Figma exports;
 // this file only adds behaviour and timing.
 import { useEffect, useRef, useState } from 'react';
 import { FigmaScreen, HitArea } from '../figma-screens/FigmaScreen';
@@ -33,7 +34,8 @@ type Step =
   | 'start' | 'remove' | 'scan' | 'welcome'
   | 'weigh' | 'weighLocked' | 'yourWeight'
   | 'postureBad' | 'postureOk' | 'countdown' | 'heightProgress' | 'heightDone' | 'yourHeight'
-  | 'overview' | 'sending' | 'ok' | 'dataSaved';
+  | 'overview' | 'sending' | 'ok' | 'dataSaved'
+  | 'woSending' | 'woOk' | 'woDataSaved';
 
 /** Automatic transitions (ms) as annotated in Figma. */
 const AUTO: Partial<Record<Step, [number, Step]>> = {
@@ -45,6 +47,8 @@ const AUTO: Partial<Record<Step, [number, Step]>> = {
   heightDone: [2000, 'yourHeight'],
   sending: [1500, 'ok'],
   dataSaved: [3000, 'start'],
+  woSending: [1500, 'woOk'],
+  woDataSaved: [3000, 'start'],
 };
 
 export type SelfMeasurementProps = {
@@ -52,6 +56,8 @@ export type SelfMeasurementProps = {
   weightKg: number;
   heightCm: number;
   isMetric: boolean;
+  /** Height required: weight + height flow; otherwise weight only. */
+  heightRequired: boolean;
   formatImperialHeight: (cm: string) => string;
 };
 
@@ -65,7 +71,7 @@ function RepeatNext({ onRepeat, onNext }: { onRepeat: () => void; onNext: () => 
   );
 }
 
-export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, formatImperialHeight }: SelfMeasurementProps) {
+export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequired, formatImperialHeight }: SelfMeasurementProps) {
   const [step, setStep] = useState<Step>('start');
   const [shownKg, setShownKg] = useState(0);
   const [count, setCount] = useState(3);
@@ -131,10 +137,13 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, formatImperi
     case 'weigh':
     case 'weighLocked': {
       const locked = step === 'weighLocked';
-      const p = locked ? 'I14010:59828;' : 'I14010:59841;';
+      // Weight-only flow uses the 2-step progress variants.
+      const [data, p] = heightRequired
+        ? locked ? [SCREENS.smWeighLocked, 'I14010:59828;'] : [SCREENS.smWeigh, 'I14010:59841;']
+        : locked ? [SCREENS.woWeighLocked, 'I14010:59830;'] : [SCREENS.woWeigh, 'I14010:59844;'];
       return (
         <FigmaScreen
-          data={locked ? SCREENS.smWeighLocked : SCREENS.smWeigh}
+          data={data}
           text={{
             [p + '13152:46913;13202:63216;13202:63011']: w(locked ? weightKg : shownKg),
             [p + '13152:46913;13202:63216;13202:63009']: wUnit,
@@ -146,6 +155,14 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, formatImperi
     }
 
     case 'yourWeight': {
+      if (!heightRequired) {
+        const p = 'I14529:37769;14217:74274;';
+        return (
+          <FigmaScreen data={SCREENS.woYourWeight} text={{ [p + '13202:63011']: w(weightKg), [p + '13202:63009']: wUnit }}>
+            <RepeatNext onRepeat={go('weigh')} onNext={go('woSending')} />
+          </FigmaScreen>
+        );
+      }
       const p = 'I14010:59820;';
       return (
         <FigmaScreen
@@ -157,6 +174,34 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, formatImperi
         </FigmaScreen>
       );
     }
+
+    case 'woSending':
+      return (
+        <FigmaScreen
+          data={SCREENS.woSending}
+          text={{
+            'I14529:38108;14525:8967;13202:63011': w(weightKg),
+            'I14529:38108;14525:8967;13202:63009': wUnit,
+            'I14529:38108;14525:8969': DEMO_PATIENT.name,
+          }}
+        />
+      );
+
+    case 'woOk':
+      return (
+        <FigmaScreen
+          data={SCREENS.woOk}
+          text={{
+            'I14531:38224;14526:9108;13202:63011': w(weightKg),
+            'I14531:38224;14526:9108;13202:63009': wUnit,
+            'I14531:38224;14526:9110': DEMO_PATIENT.name,
+          }}
+          onClick={{ 'I14531:38224;14526:9111': go('woDataSaved') }}
+        />
+      );
+
+    case 'woDataSaved':
+      return <FigmaScreen data={SCREENS.woDataSaved} />;
 
     case 'postureBad':
       return <FigmaScreen data={SCREENS.smPostureBad} onClick={{ 'I14010:59862;13166:56266;13152:49129': startCountdown }} />;

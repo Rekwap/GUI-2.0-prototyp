@@ -46,6 +46,12 @@ import smOverview from './screens/15626-53930.json';
 import smSending from './screens/14010-59882.json';
 import smOk from './screens/14010-59884.json';
 import smDataSaved from './screens/15587-50166.json';
+import woWeigh from './screens/14010-59843.json';
+import woWeighLocked from './screens/14010-59829.json';
+import woYourWeight from './screens/14529-37768.json';
+import woSending from './screens/14529-38107.json';
+import woOk from './screens/14531-38223.json';
+import woDataSaved from './screens/14529-37776.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -93,6 +99,12 @@ export const SCREENS = {
   smSending: smSending as unknown as FNode,
   smOk: smOk as unknown as FNode,
   smDataSaved: smDataSaved as unknown as FNode,
+  woWeigh: woWeigh as unknown as FNode,
+  woWeighLocked: woWeighLocked as unknown as FNode,
+  woYourWeight: woYourWeight as unknown as FNode,
+  woSending: woSending as unknown as FNode,
+  woOk: woOk as unknown as FNode,
+  woDataSaved: woDataSaved as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -140,5 +152,11 @@ export const FIGMA_IDS = {
   "smOverview": "15626:53930",
   "smSending": "14010:59882",
   "smOk": "14010:59884",
-  "smDataSaved": "15587:50166"
+  "smDataSaved": "15587:50166",
+  "woWeigh": "14010:59843",
+  "woWeighLocked": "14010:59829",
+  "woYourWeight": "14529:37768",
+  "woSending": "14529:38107",
+  "woOk": "14531:38223",
+  "woDataSaved": "14529:37776"
 } as const;

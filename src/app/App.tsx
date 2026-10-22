@@ -1621,6 +1621,7 @@ function AppContent() {
                 weightKg={parseFloat(testWeight) || 0}
                 heightCm={parseFloat(testHeight) || 0}
                 isMetric={isMetric}
+                heightRequired={heightRequired}
                 formatImperialHeight={convertCmToFeetInches}
               />}
         </div>

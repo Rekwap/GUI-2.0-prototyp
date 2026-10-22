@@ -1678,7 +1678,7 @@ function AppContent() {
             transformOrigin: 'center center'
           }}
         >
-          <MenuFlow onClose={handleMenuClose} onRestart={handleRestartConfirm} />
+          <MenuFlow onClose={handleMenuClose} onRestart={handleRestartConfirm} controlPanel={showControlPanel} onToggleControlPanel={handleToggleControlPanel} />
         </div>
         {showControlPanel && (
           <ControlPanel 

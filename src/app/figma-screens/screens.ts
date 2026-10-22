@@ -112,6 +112,8 @@ import mLoadCells from './screens/10024-17659.json';
 import mAdjustment from './screens/10024-19085.json';
 import mRestart from './screens/10102-13422.json';
 import mServicePin from './screens/10024-18951.json';
+import mPretareKeypad from './screens/13061-26953.json';
+import mPretareSet from './screens/13061-27010.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -225,6 +227,8 @@ export const SCREENS = {
   mAdjustment: mAdjustment as unknown as FNode,
   mRestart: mRestart as unknown as FNode,
   mServicePin: mServicePin as unknown as FNode,
+  mPretareKeypad: mPretareKeypad as unknown as FNode,
+  mPretareSet: mPretareSet as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -338,5 +342,7 @@ export const FIGMA_IDS = {
   "mLoadCells": "10024:17659",
   "mAdjustment": "10024:19085",
   "mRestart": "10102:13422",
-  "mServicePin": "10024:18951"
+  "mServicePin": "10024:18951",
+  "mPretareKeypad": "13061:26953",
+  "mPretareSet": "13061:27010"
 } as const;

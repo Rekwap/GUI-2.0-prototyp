@@ -42,11 +42,14 @@ const PAGES: Record<string, Page> = {
   dateFormat: { s: 'mDateFormat' },
   bmiBsa: { s: 'mBmiBsa' },
 
-  weight: { s: 'mWeight', rows: ['autohold', null, 'sensitivity', 'tareScan', 'pretare'] },
+  // "Pre-Tare Presets" and "Pre-tare" both open the Pre-tare frames (Figma 19525:73616).
+  weight: { s: 'mWeight', rows: ['autohold', 'pretare', 'sensitivity', 'tareScan', 'pretare'] },
   autohold: { s: 'mAutohold', hits: [YESNO_96] },
   sensitivity: { s: 'mSensitivity' },
   tareScan: { s: 'mTareScan' },
-  pretare: { s: 'mPretare', hits: [{ x: 112, y: 418, w: 48, h: 48, to: 'back' }] },
+  pretare: { s: 'mPretare', hits: [{ x: 56, y: 330, w: 160, h: 40, to: 'pretareKeypad' }, { x: 112, y: 418, w: 48, h: 48, to: 'back' }] },
+  pretareKeypad: { s: 'mPretareKeypad', hits: [{ x: 2, y: 85, w: 50, h: 50, to: 'back' }, KEYPAD_OK('<pretareSet')] },
+  pretareSet: { s: 'mPretareSet', hits: [{ x: 56, y: 330, w: 160, h: 40, to: 'pretareKeypad' }, { x: 112, y: 418, w: 48, h: 48, to: 'back' }] },
 
   networkOn: { s: 'mNetworkOn', rows: ['=networkOff', 'wifiSearch', 'server', 'identification'] },
   networkOff: { s: 'mNetworkOff', rows: ['=networkOn', null, 'server', 'identification'] },
@@ -85,7 +88,9 @@ const PAGES: Record<string, Page> = {
   },
 };
 
-export function MenuFlow({ onClose, onRestart }: { onClose: () => void; onRestart: () => void }) {
+type Props = { onClose: () => void; onRestart: () => void; controlPanel: boolean; onToggleControlPanel: () => void };
+
+export function MenuFlow({ onClose, onRestart, controlPanel, onToggleControlPanel }: Props) {
   const [stack, setStack] = useState<string[]>(['menu']);
   const id = stack[stack.length - 1];
   const page = PAGES[id];
@@ -95,6 +100,7 @@ export function MenuFlow({ onClose, onRestart }: { onClose: () => void; onRestar
     if (to === 'back') return stack.length > 1 ? setStack(stack.slice(0, -1)) : onClose();
     if (to === '!restart') return onRestart();
     if (to.startsWith('=')) return setStack([...stack.slice(0, -1), to.slice(1)]);
+    if (to.startsWith('<')) return setStack([...stack.slice(0, -2), to.slice(1)]); // pop two, push
     setStack([...stack, to]);
   };
 
@@ -117,6 +123,20 @@ export function MenuFlow({ onClose, onRestart }: { onClose: () => void; onRestar
       {page.hits?.map((h, i) => (
         <HitArea key={'h' + i} x={h.x} y={h.y} w={h.w} h={h.h} label={h.to} onClick={() => go(h.to)} />
       ))}
+      {id === 'menu' && (
+        // Prototype-only entry (not part of the device GUI): deliberately styled apart, in brackets.
+        <button
+          type="button"
+          onClick={onToggleControlPanel}
+          style={{
+            position: 'absolute', left: 6, top: 58 + 52 * 4, width: 260, height: 52, padding: '0 12px',
+            background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left',
+            fontFamily: "'Noto Sans Display', sans-serif", fontWeight: 500, fontSize: 16, color: '#8b8d91',
+          }}
+        >
+          [Control Panel: {controlPanel ? 'ein' : 'aus'}]
+        </button>
+      )}
     </FigmaScreen>
   );
 }

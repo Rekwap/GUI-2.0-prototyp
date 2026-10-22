@@ -24,6 +24,7 @@ import i1evdmji from './icons/i1evdmji.svg';
 import i1fvdn15 from './icons/i1fvdn15.svg';
 import i1gv39gd from './icons/i1gv39gd.svg';
 import i1i5tp6h from './icons/i1i5tp6h.svg';
+import i1i8f8m from './icons/i1i8f8m.svg';
 import i1iegfib from './icons/i1iegfib.svg';
 import i1ipebnm from './icons/i1ipebnm.svg';
 import i1jzaeby from './icons/i1jzaeby.svg';
@@ -32,6 +33,7 @@ import i1kgbyx1 from './icons/i1kgbyx1.svg';
 import i1khvb96 from './icons/i1khvb96.svg';
 import i1ko401f from './icons/i1ko401f.svg';
 import i1ljtby6 from './icons/i1ljtby6.svg';
+import i1loxdap from './icons/i1loxdap@4x.png';
 import i1n4k4p0 from './icons/i1n4k4p0.svg';
 import i1oahwhx from './icons/i1oahwhx.svg';
 import i1pb0oiw from './icons/i1pb0oiw.svg';
@@ -119,6 +121,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i1fvdn15: { src: i1fvdn15, w: 60, h: 60 },
   i1gv39gd: { src: i1gv39gd, w: 260, h: 52 },
   i1i5tp6h: { src: i1i5tp6h, w: 268, h: 68 },
+  i1i8f8m: { src: i1i8f8m, w: 50, h: 50 },
   i1iegfib: { src: i1iegfib, w: 80, h: 80 },
   i1ipebnm: { src: i1ipebnm, w: 50, h: 50 },
   i1jzaeby: { src: i1jzaeby, w: 136, h: 50 },
@@ -127,6 +130,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i1khvb96: { src: i1khvb96, w: 22, h: 4 },
   i1ko401f: { src: i1ko401f, w: 160, h: 96 },
   i1ljtby6: { src: i1ljtby6, w: 96, h: 24 },
+  i1loxdap: { src: i1loxdap, w: 270, h: 306 },
   i1n4k4p0: { src: i1n4k4p0, w: 62, h: 48 },
   i1oahwhx: { src: i1oahwhx, w: 36, h: 36 },
   i1pb0oiw: { src: i1pb0oiw, w: 140, h: 50 },

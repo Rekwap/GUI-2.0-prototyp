@@ -31,10 +31,11 @@ export function TareAssistant({ isMetric, onBack, onTare, onMotherChild, onCloth
   const [step, setStep] = useState<Step>('menu');
   // Clothing value is kept in display units (kg: 0.5 steps, lbs: 1.0 steps).
   const [clothing, setClothing] = useState(() => {
-    const kg = Math.max(initialClothingKg, minClothingKg);
-    return isMetric ? kg : Math.round(kg * KG_TO_LBS);
+    const v = isMetric ? initialClothingKg : Math.round(initialClothingKg * KG_TO_LBS);
+    const min = isMetric ? minClothingKg : Math.ceil(minClothingKg * KG_TO_LBS - 1e-9);
+    return Math.max(v, min);
   });
-  const minClothing = isMetric ? minClothingKg : Math.round(minClothingKg * KG_TO_LBS);
+  const minClothing = isMetric ? minClothingKg : Math.ceil(minClothingKg * KG_TO_LBS - 1e-9);
 
   // Adult weight settles, then the scale tares automatically.
   useEffect(() => {

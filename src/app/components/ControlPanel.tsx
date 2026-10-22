@@ -3,6 +3,44 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { BUILD_STAMP } from "../version";
 import { Slider } from "./ui/slider";
+import { useEffect, useRef, useState, type ComponentProps } from "react";
+
+const KG_TO_LBS = 2.20462;
+const CM_TO_IN = 1 / 2.54;
+
+/**
+ * Text field that edits a value stored in metric (kg / cm) but shows it in the
+ * selected unit system. Typing is kept as entered; the metric value is derived.
+ */
+function UnitInput({ value, onValue, factor, decimals, placeholder, ...rest }: {
+  value: string; onValue: (metric: string) => void; factor: number; decimals: number; placeholder: string;
+} & Omit<ComponentProps<typeof Input>, 'value' | 'onChange' | 'placeholder'>) {
+  const show = (v: string) => (v === '' || isNaN(parseFloat(v)) ? v : (parseFloat(v) * factor).toFixed(decimals));
+  const [text, setText] = useState(() => show(value));
+  const own = useRef(value);
+  // Resync when the unit changes or the value is changed from outside (e.g. reset).
+  useEffect(() => {
+    if (value !== own.current) { setText(show(value)); own.current = value; }
+  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setText(show(value)); }, [factor]); // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <Input
+      {...rest}
+      type="text"
+      inputMode="decimal"
+      value={text}
+      placeholder={(parseFloat(placeholder) * factor).toFixed(decimals)}
+      onChange={(e) => {
+        const t = e.target.value;
+        setText(t);
+        const n = parseFloat(t);
+        const metric = t === '' ? '' : isNaN(n) ? t : String(+(n / factor).toFixed(4));
+        own.current = metric;
+        onValue(metric);
+      }}
+    />
+  );
+}
 
 interface ControlPanelProps {
   heightMode: 'manual' | 'ultrasonic' | 'tactile';
@@ -86,6 +124,10 @@ export default function ControlPanel({
   ultrasonicOnly = false,
   printing = false
 }: ControlPanelProps) {
+  const wf = isMetric ? 1 : KG_TO_LBS;
+  const hf = isMetric ? 1 : CM_TO_IN;
+  const wu = isMetric ? 'kg' : 'lbs';
+  const hu = isMetric ? 'cm' : 'in';
   return (
     <div className="flex flex-col h-[480px] w-[320px] p-6 bg-[rgb(233,233,233)] rounded-lg shadow-md flex-shrink-0 overflow-auto">
       <div className="flex flex-col gap-4">
@@ -222,39 +264,39 @@ export default function ControlPanel({
         <div className="grid grid-cols-3 gap-2">
           {onTestWeightChange && (
           <div className="flex flex-col gap-1 min-w-0">
-            <Label htmlFor={`test-weight${uniqueId}`} className="text-xs">Weight (kg)</Label>
-            <Input
-              type="text"
-              inputMode="decimal"
+            <Label htmlFor={`test-weight${uniqueId}`} className="text-xs">Weight ({wu})</Label>
+            <UnitInput
               id={`test-weight${uniqueId}`}
               value={testWeight || ''}
-              onChange={(e) => onTestWeightChange(e.target.value)}
+              onValue={onTestWeightChange}
+              factor={wf}
+              decimals={2}
               placeholder="54.80"
               className="w-full h-8 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           )}
           <div className="flex flex-col gap-1 min-w-0">
-            <Label htmlFor={`test-height${uniqueId}`} className="text-xs">Height (cm)</Label>
-            <Input
-              type="text"
-              inputMode="decimal"
+            <Label htmlFor={`test-height${uniqueId}`} className="text-xs">Height ({hu})</Label>
+            <UnitInput
               id={`test-height${uniqueId}`}
               value={testHeight || ''}
-              onChange={(e) => onTestHeightChange(e.target.value)}
+              onValue={onTestHeightChange}
+              factor={hf}
+              decimals={1}
               placeholder="167.7"
               className="w-full h-8 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           {onPretareChange && (
           <div className="flex flex-col gap-1 min-w-0">
-            <Label htmlFor={`pretare${uniqueId}`} className="text-xs">Pre-tare (kg)</Label>
-            <Input
-              type="text"
-              inputMode="decimal"
+            <Label htmlFor={`pretare${uniqueId}`} className="text-xs">Pre-tare ({wu})</Label>
+            <UnitInput
               id={`pretare${uniqueId}`}
               value={pretare || ''}
-              onChange={(e) => onPretareChange(e.target.value)}
+              onValue={onPretareChange}
+              factor={wf}
+              decimals={2}
               placeholder="0.00"
               className="w-full h-8 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -263,13 +305,13 @@ export default function ControlPanel({
         </div>
         {onScanTare && onTareBarcodeChange && (
           <div className="flex items-center gap-2 -mt-2">
-            <Label htmlFor={`tare-barcode${uniqueId}`} className="text-xs whitespace-nowrap">Tare barcode (kg)</Label>
-            <Input
-              type="text"
-              inputMode="decimal"
+            <Label htmlFor={`tare-barcode${uniqueId}`} className="text-xs whitespace-nowrap">Tare barcode ({wu})</Label>
+            <UnitInput
               id={`tare-barcode${uniqueId}`}
               value={tareBarcode || ''}
-              onChange={(e) => onTareBarcodeChange(e.target.value)}
+              onValue={onTareBarcodeChange}
+              factor={wf}
+              decimals={2}
               placeholder="0.60"
               className="w-20 h-7 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

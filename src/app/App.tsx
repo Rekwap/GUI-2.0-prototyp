@@ -999,9 +999,9 @@ function AppContent() {
       setPtSuspended(true);
       if (parseFloat(rawWeight) !== 0) {
         const net = parseFloat(rawWeight) - kg;
-        setWeight((isMetric ? net : kgToLbs(net)).toFixed(2));
+        setWeight(net.toFixed(2));
       } else {
-        setWeight((isMetric ? -kg : -kgToLbs(kg)).toFixed(2));
+        setWeight((-kg).toFixed(2));
       }
     }, 3000);
     return () => clearTimeout(t);
@@ -1028,7 +1028,7 @@ function AppContent() {
       setRawWeight(totalRawWeight.toFixed(2));
       
       // Displayed weight is just the baby weight (net)
-      const displayWeight = isMetric ? babyWeight : kgToLbs(babyWeight);
+      const displayWeight = babyWeight; // weight state is always kg
       setWeight(displayWeight.toFixed(2));
       return;
     }
@@ -1044,7 +1044,7 @@ function AppContent() {
     // Add the test weight (Control Panel) to the current displayed weight
     const kg = parseFloat(testWeight) || 0;
     const net = kg - tareKgNow();
-    setWeight((isMetric ? net : kgToLbs(net)).toFixed(2));
+    setWeight(net.toFixed(2));
     setRawWeight(kg.toFixed(2));
   };
 
@@ -1055,7 +1055,7 @@ function AppContent() {
     if (isNaN(kg) || parseFloat(rawWeight) === 0 || taredWeight !== null) return;
     const net = kg - tareKgNow();
     setRawWeight(kg.toFixed(2));
-    setWeight((isMetric ? net : kgToLbs(net)).toFixed(2));
+    setWeight(net.toFixed(2));
   };
 
   const handleReweight = () => {
@@ -1072,7 +1072,7 @@ function AppContent() {
       const netWeight = measuredWeight - totalTare;
       
       // Convert to display unit (metric or imperial)
-      const displayWeight = isMetric ? netWeight : kgToLbs(netWeight);
+      const displayWeight = netWeight; // weight state is always kg
       setWeight(displayWeight.toFixed(2));
       setIsReweighting(false);
       setShowReweightButton(true);
@@ -1268,7 +1268,7 @@ function AppContent() {
     const netWeight = measuredWeight - totalTare;
     
     // Convert to display unit
-    const displayWeight = isMetric ? netWeight : kgToLbs(netWeight);
+    const displayWeight = netWeight; // weight state is always kg
     setWeight(displayWeight.toFixed(2));
   };
 
@@ -1296,7 +1296,7 @@ function AppContent() {
     const netWeight = measuredWeight - totalTare;
     
     // Convert to display unit
-    const displayWeight = isMetric ? netWeight : kgToLbs(netWeight);
+    const displayWeight = netWeight; // weight state is always kg
     setWeight(displayWeight.toFixed(2));
   };
 
@@ -1306,7 +1306,7 @@ function AppContent() {
     setMotherMode(false);
     
     // Reset weight to raw weight
-    const displayWeight = isMetric ? parseFloat(rawWeight) : kgToLbs(parseFloat(rawWeight));
+    const displayWeight = parseFloat(rawWeight); // weight state is always kg
     setWeight(displayWeight.toFixed(2));
   };
 
@@ -2097,7 +2097,7 @@ function AppContent() {
               setTaredWeight(adultKg.toFixed(2));
               setPreTareValues([]);
               setRawWeight((adultKg + childKg).toFixed(2));
-              setWeight((isMetric ? childKg : kgToLbs(childKg)).toFixed(2));
+              setWeight(childKg.toFixed(2));
               setMotherMode(true);
               setPtSuspended(true);
               setShowReweightButton(true);
@@ -2110,7 +2110,7 @@ function AppContent() {
               setPtSuspended(true);
               const manualTare = taredWeight ? parseFloat(taredWeight) : 0;
               const net = parseFloat(rawWeight) - valueKg - manualTare;
-              setWeight((isMetric ? net : kgToLbs(net)).toFixed(2));
+              setWeight(net.toFixed(2));
               setShowTareAssistant(false);
             }}
             initialClothingKg={preTareValues.reduce((sum, v) => sum + parseFloat(v), 0)}
@@ -2586,7 +2586,7 @@ function AppContent() {
           }}
         >
           <OverviewScreen
-            weight={parseFloat(weight).toFixed(2)}
+            weight={parseFloat(formatWeight(weight)).toFixed(2)}
             height={heightMeasured ? formatHeight(heightValue ?? testHeight) : null}
             isMetric={isMetric}
             patient={isPatientLoggedIn}

@@ -1622,6 +1622,7 @@ function AppContent() {
                 heightCm={parseFloat(testHeight) || 0}
                 isMetric={isMetric}
                 heightRequired={heightRequired}
+                integrated={installationMode !== 'standalone'}
                 formatImperialHeight={convertCmToFeetInches}
               />}
         </div>

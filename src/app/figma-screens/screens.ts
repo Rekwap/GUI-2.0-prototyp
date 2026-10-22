@@ -52,6 +52,10 @@ import woYourWeight from './screens/14529-37768.json';
 import woSending from './screens/14529-38107.json';
 import woOk from './screens/14531-38223.json';
 import woDataSaved from './screens/14529-37776.json';
+import saNote from './screens/14524-31162.json';
+import saStepOff from './screens/14531-39002.json';
+import saNoteWo from './screens/14529-37196.json';
+import saStepOffWo from './screens/14529-37194.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -105,6 +109,10 @@ export const SCREENS = {
   woSending: woSending as unknown as FNode,
   woOk: woOk as unknown as FNode,
   woDataSaved: woDataSaved as unknown as FNode,
+  saNote: saNote as unknown as FNode,
+  saStepOff: saStepOff as unknown as FNode,
+  saNoteWo: saNoteWo as unknown as FNode,
+  saStepOffWo: saStepOffWo as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -158,5 +166,9 @@ export const FIGMA_IDS = {
   "woYourWeight": "14529:37768",
   "woSending": "14529:38107",
   "woOk": "14531:38223",
-  "woDataSaved": "14529:37776"
+  "woDataSaved": "14529:37776",
+  "saNote": "14524:31162",
+  "saStepOff": "14531:39002",
+  "saNoteWo": "14529:37196",
+  "saStepOffWo": "14529:37194"
 } as const;

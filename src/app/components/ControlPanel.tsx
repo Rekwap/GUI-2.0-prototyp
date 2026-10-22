@@ -26,6 +26,8 @@ interface ControlPanelProps {
   onScanBarcode?: (kind: 'patient' | 'user') => void;
   /** Self-measurement: only ultrasonic height measurement is available. */
   ultrasonicOnly?: boolean;
+  /** Simple print: a printout is being produced (no feedback on the device screen). */
+  printing?: boolean;
 }
 
 function ScanButton({ label, onClick }: { label: string; onClick: () => void }) {
@@ -65,7 +67,8 @@ export default function ControlPanel({
   zoomLevel = 100,
   onZoomLevelChange,
   onScanBarcode,
-  ultrasonicOnly = false
+  ultrasonicOnly = false,
+  printing = false
 }: ControlPanelProps) {
   return (
     <div className="flex flex-col h-[480px] w-[320px] p-6 bg-[rgb(233,233,233)] rounded-lg shadow-md flex-shrink-0 overflow-auto">
@@ -102,6 +105,7 @@ export default function ControlPanel({
                   onChange={() => onInstallationModeChange(value)}
                 />
                 <Label htmlFor={`installation-${value}${uniqueId}`}>{label}</Label>
+                {value === 'simpleprint' && printing && <span className="text-xs text-gray-600 italic">Printing…</span>}
               </div>
             ))}
           </div>

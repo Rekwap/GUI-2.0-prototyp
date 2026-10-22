@@ -23,6 +23,8 @@ import tare48Icon from './assets/icons/tare48.svg';
 import recall48Icon from './assets/icons/recall48.svg';
 import send48Icon from './assets/icons/send48.svg';
 import send48StandaloneIcon from './assets/icons/send48Standalone.svg';
+import print48Icon from './assets/icons/print48.svg';
+import printStatusIcon from './assets/icons/printStatus.svg';
 import heightButton from './assets/icons/heightButton.svg';
 import stepsIcon from './assets/icons/steps@4x.png';
 
@@ -42,9 +44,11 @@ export type StatusBarProps = {
   warning?: boolean;
   onMenu?: () => void;
   onLogout?: () => void;
+  /** Simple print: printer icon left of the network icon. */
+  printer?: boolean;
 };
 
-export function StatusBar({ login, warning, onMenu, onLogout }: StatusBarProps) {
+export function StatusBar({ login, warning, onMenu, onLogout, printer }: StatusBarProps) {
   return (
     <>
       <Box x={0} y={0} w={272} h={50} style={{ background: COLORS.panel }} />
@@ -52,6 +56,7 @@ export function StatusBar({ login, warning, onMenu, onLogout }: StatusBarProps) 
         <Icon src={menuIcon} x={0} y={0} w={50} h={50} />
       </button>
       <Icon src={wifiIcon} x={222} y={0} w={50} h={50} />
+      {printer && <Icon src={printStatusIcon} x={172} y={0} w={50} h={50} />}
       {warning && login.kind === 'none' && <Icon src={warningBanner} x={94} y={0} w={84} h={44} />}
       {login.kind !== 'none' && <LoginBannerView login={login} onLogout={onLogout} />}
     </>
@@ -240,6 +245,8 @@ export type ButtonBarProps = {
   onConfirm?: () => void;
   /** Stand-alone version: CONFIRM is shown like the other buttons (not highlighted). */
   standalone?: boolean;
+  /** Simple print: third button is PRINT (prints only, no screen change). */
+  print?: boolean;
 };
 
 function BarButton({ x, icon, label, active, onClick }: { x: number; icon: string; label: string; active?: boolean; onClick?: () => void }) {
@@ -255,13 +262,15 @@ function BarButton({ x, icon, label, active, onClick }: { x: number; icon: strin
   );
 }
 
-export function ButtonBar({ onTare, onRecall, onConfirm, standalone }: ButtonBarProps) {
+export function ButtonBar({ onTare, onRecall, onConfirm, standalone, print }: ButtonBarProps) {
   return (
     <Box x={0} y={408} w={272} h={72} style={{ background: COLORS.white }}>
       <Icon src={buttonBarBg} x={0} y={0} w={272} h={72} />
       <BarButton x={12} icon={tare48Icon} label="TARE" onClick={onTare} />
       <BarButton x={95} icon={recall48Icon} label="RECALL" onClick={onRecall} />
-      <BarButton x={178} icon={standalone ? send48StandaloneIcon : send48Icon} label="CONFIRM" active={!standalone} onClick={onConfirm} />
+      {print
+        ? <BarButton x={178} icon={print48Icon} label="PRINT" onClick={onConfirm} />
+        : <BarButton x={178} icon={standalone ? send48StandaloneIcon : send48Icon} label="CONFIRM" active={!standalone} onClick={onConfirm} />}
     </Box>
   );
 }

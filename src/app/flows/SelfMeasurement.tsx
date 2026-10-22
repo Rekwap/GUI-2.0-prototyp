@@ -68,6 +68,8 @@ export type SelfMeasurementProps = {
   heightRequired: boolean;
   /** Integrated (EMR): barcode login + sending. Stand-alone: note down result. Simple print: printout. */
   installation: 'integrated' | 'standalone' | 'simpleprint';
+  /** Simple print: printout is triggered automatically with the result screen. */
+  onPrint?: () => void;
   formatImperialHeight: (cm: string) => string;
 };
 
@@ -81,7 +83,7 @@ function RepeatNext({ onRepeat, onNext }: { onRepeat: () => void; onNext: () => 
   );
 }
 
-export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequired, installation, formatImperialHeight }: SelfMeasurementProps) {
+export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequired, installation, onPrint, formatImperialHeight }: SelfMeasurementProps) {
   const integrated = installation === 'integrated';
   const print = installation === 'simpleprint';
   const [step, setStep] = useState<Step>('start');
@@ -96,6 +98,11 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
     const t = setTimeout(() => setStep(a[1]), a[0]);
     return () => clearTimeout(t);
   }, [step]);
+
+  // Simple print: prints automatically when the result is shown.
+  useEffect(() => {
+    if (step === 'spNote' || step === 'spNoteWo') onPrint?.();
+  }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Weighing: value settles from 0.00 to the patient weight, then locks.
   useEffect(() => {

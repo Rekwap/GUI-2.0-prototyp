@@ -848,6 +848,13 @@ function AppContent() {
   const [deviceMode, setDeviceMode] = useState<'choose' | 'guided' | 'self'>('choose');
   // Stand-alone: CONFIRM opens the "Integration" info screen (QR code).
   const [showStandaloneInfo, setShowStandaloneInfo] = useState(false);
+  // Simple print: printing gives no feedback on the device; shown in the control panel only.
+  const [printing, setPrinting] = useState(false);
+  useEffect(() => {
+    if (!printing) return;
+    const t = setTimeout(() => setPrinting(false), 2500);
+    return () => clearTimeout(t);
+  }, [printing]);
   
   // Unit system: 'metric' | 'imperial'
   const [isMetric, setIsMetric] = useState(true);
@@ -1259,6 +1266,10 @@ function AppContent() {
   };
 
   const handleSendClick = () => {
+    if (installationMode === 'simpleprint') {
+      setPrinting(true);
+      return;
+    }
     if (installationMode !== 'integrated') {
       setShowStandaloneInfo(true);
       return;
@@ -1623,6 +1634,7 @@ function AppContent() {
                 isMetric={isMetric}
                 heightRequired={heightRequired}
                 installation={installationMode}
+                onPrint={() => setPrinting(true)}
                 formatImperialHeight={convertCmToFeetInches}
               />}
         </div>
@@ -1643,6 +1655,7 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             uniqueId="-device"
+            printing={printing}
             ultrasonicOnly={deviceMode === 'self'}
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2697,7 +2710,7 @@ function AppContent() {
                 };
           return (
             <MainScreen
-              statusBar={{ login, onMenu: handleMenuClick, onLogout: handleLogout }}
+              statusBar={{ login, onMenu: handleMenuClick, onLogout: handleLogout, printer: installationMode === 'simpleprint' }}
               weight={{
                 state: 'value',
                 value: parseFloat(formatWeight(weight)).toFixed(2),
@@ -2717,7 +2730,7 @@ function AppContent() {
                 onRemoveTare: handleRemoveTare,
               }}
               height={height}
-              buttons={{ onTare: handleTareClick, onRecall: handleRecallClick, onConfirm: handleSendClick, standalone: installationMode !== 'integrated' }}
+              buttons={{ onTare: handleTareClick, onRecall: handleRecallClick, onConfirm: handleSendClick, standalone: installationMode !== 'integrated', print: installationMode === 'simpleprint' }}
             />
           );
         })()}
@@ -2774,6 +2787,7 @@ function AppContent() {
           onTestWeightChange={handleTestWeightChange}
           onTestHeightChange={setTestHeight}
           uniqueId="-main"
+            printing={printing}
           onScanBarcode={handleBarcodeScan}
           onReset={handleReset}
           zoomLevel={zoomLevel}

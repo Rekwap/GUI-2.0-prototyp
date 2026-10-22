@@ -51,6 +51,7 @@ import DialogRestartComponent from './imports/DialogRestart';
 import BmiBsaMenu from './components/BmiBsaMenu';
 import { MainScreen, type HeightPanelProps, type LoginBanner } from './main-screen/MainScreen';
 import { TareAssistant } from './flows/TareAssistant';
+import { MenuFlow } from './flows/MenuFlow';
 import { RecallScreen, ScanIdScreen, IdConfirmedScreen, OverviewScreen, TransmittingScreen, DataSavedScreen, IntegrationInfoScreen } from './flows/SendFlow';
 
 // Wrapper component for consistent layout
@@ -1677,104 +1678,7 @@ function AppContent() {
             transformOrigin: 'center center'
           }}
         >
-          <div className="absolute inset-0">
-            {currentMenuScreen === 'main' && (
-              <MenuComponent 
-                onClose={handleMenuClose}
-                onInfoClick={() => setCurrentMenuScreen('info')}
-                onSettingsClick={() => setCurrentMenuScreen('settings')}
-                onServiceClick={() => setCurrentMenuScreen('service')}
-                onIntegrationInfoClick={() => {
-                  setShowMenu(false);
-                  setCurrentMenuScreen('main');
-                  setShowIntegrationInfo(true);
-                }}
-                onServerConnectionClick={() => {
-                  setShowMenu(false);
-                  setCurrentMenuScreen('main');
-                  setShowServerConnection(true);
-                }}
-                onRestartClick={handleRestartClick}
-                showControlPanel={showControlPanel}
-                onToggleControlPanel={handleToggleControlPanel}
-              />
-            )}
-            {currentMenuScreen === 'info' && (
-              <InfoComponent
-                onBack={handleMenuBack}
-                onHome={handleMenuClose}
-                onUserManualClick={() => console.log('User Manual clicked')}
-                onHelpClick={() => console.log('Help clicked')}
-                onAboutClick={() => console.log('About clicked')}
-              />
-            )}
-            {currentMenuScreen === 'settings' && (
-              <SettingsComponent
-                onBack={handleMenuBack}
-                onHome={handleMenuClose}
-                onDisplayClick={() => setCurrentMenuScreen('display')}
-                onWeightClick={() => console.log('Weight clicked')}
-                onNetworkClick={() => {
-                  setShowMenu(false);
-                  setCurrentMenuScreen('main');
-                  setShowNetwork(true);
-                }}
-                onRS232Click={() => console.log('RS232 clicked')}
-                onHeightClick={() => {
-                  setShowMenu(false);
-                  setCurrentMenuScreen('main');
-                  setShowHeightCalibration(true);
-                }}
-                onAudioClick={() => console.log('Audio clicked')}
-                onBatteryClick={() => console.log('Battery clicked')}
-                showControlPanel={showControlPanel}
-                onToggleControlPanel={handleToggleControlPanel}
-              />
-            )}
-            {currentMenuScreen === 'service' && (
-              <ServiceComponent
-                onBack={handleMenuBack}
-                onHome={handleMenuClose}
-                onModuleInfoClick={() => console.log('Module Info clicked')}
-                onConfigurationModeClick={() => console.log('Configuration Mode clicked')}
-                onServiceToolsClick={() => console.log('Service Tools clicked')}
-                onFactoryResetClick={() => console.log('Factory Reset clicked')}
-                onSettingsLockClick={() => console.log('Settings Lock clicked')}
-              />
-            )}
-            {currentMenuScreen === 'restart' && (
-              <DialogRestartComponent
-                onConfirm={handleRestartConfirm}
-                onCancel={handleRestartCancel}
-              />
-            )}
-            {currentMenuScreen === 'display' && (
-              <DisplayComponent
-                onBack={handleMenuBack}
-                onHome={handleMenuClose}
-                onLanguageClick={() => setCurrentMenuScreen('language')}
-                onUnitsClick={() => console.log('Units clicked')}
-                onClearValuesClick={() => console.log('Clear Values clicked')}
-                onBrightnessClick={() => console.log('Brightness clicked')}
-                onStandbyClick={() => console.log('Standby clicked')}
-                onNameFormatClick={() => console.log('Name Format clicked')}
-                onDateFormatClick={() => console.log('Date Format clicked')}
-                onBmiBsaClick={() => setCurrentMenuScreen('bmiBsa')}
-              />
-            )}
-            {currentMenuScreen === 'language' && (
-              <LanguageComponent
-                onBack={handleMenuBack}
-                onHome={handleMenuClose}
-              />
-            )}
-            {currentMenuScreen === 'bmiBsa' && (
-              <BmiBsaMenu
-                onBack={handleMenuBack}
-                onHome={handleMenuClose}
-              />
-            )}
-          </div>
+          <MenuFlow onClose={handleMenuClose} onRestart={handleRestartConfirm} />
         </div>
         {showControlPanel && (
           <ControlPanel 

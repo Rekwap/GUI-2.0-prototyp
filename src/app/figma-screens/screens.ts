@@ -60,6 +60,58 @@ import spNote from './screens/14531-38874.json';
 import spStepOff from './screens/14531-38853.json';
 import spNoteWo from './screens/14531-39023.json';
 import spStepOffWo from './screens/14531-38851.json';
+import mMenu from './screens/10024-17987.json';
+import mInfo from './screens/10024-16652.json';
+import mUserManual from './screens/10049-13215.json';
+import mHelp from './screens/10049-13242.json';
+import mAboutSystem from './screens/10024-18894.json';
+import mAboutVersion from './screens/10024-18908.json';
+import mAboutManufacturer from './screens/10024-18922.json';
+import mSettings from './screens/10052-42212.json';
+import mDisplay1 from './screens/10024-16725.json';
+import mDisplay2 from './screens/10052-42675.json';
+import mLanguage1 from './screens/10049-13269.json';
+import mLanguage2 from './screens/10052-44569.json';
+import mLanguage3 from './screens/10052-44690.json';
+import mUnits from './screens/10052-44848.json';
+import mClearValues from './screens/10052-45058.json';
+import mBrightness from './screens/10052-45214.json';
+import mStandby from './screens/10024-16976.json';
+import mNameFormat from './screens/10024-17021.json';
+import mDateFormat from './screens/10052-11455.json';
+import mBmiBsa from './screens/10024-17111.json';
+import mWeight from './screens/10024-17498.json';
+import mAutohold from './screens/10064-11407.json';
+import mSensitivity from './screens/10024-17159.json';
+import mTareScan from './screens/10066-11082.json';
+import mPretare from './screens/12336-22148.json';
+import mNetworkOff from './screens/10024-17249.json';
+import mNetworkOn from './screens/10024-17382.json';
+import mWifiSearch from './screens/10024-18064.json';
+import mWifiList from './screens/10024-18081.json';
+import mServer from './screens/14669-34147.json';
+import mIdentification from './screens/10024-17447.json';
+import mClearData from './screens/10024-18691.json';
+import mRs232 from './screens/10024-17293.json';
+import mProtocol from './screens/10024-18696.json';
+import mAudio from './screens/10024-18741.json';
+import mAudioLanguage from './screens/12232-34689.json';
+import mVolume from './screens/10102-12544.json';
+import mBattery from './screens/10024-18831.json';
+import mService from './screens/10024-19018.json';
+import mInfoDisplay from './screens/10024-18936.json';
+import mInfoInterface from './screens/10024-18976.json';
+import mInfoWeight from './screens/10024-19004.json';
+import mInfoVerification from './screens/10024-18990.json';
+import mConfigMode from './screens/10102-13253.json';
+import mCalibration from './screens/10024-19346.json';
+import mFactoryReset from './screens/10102-13439.json';
+import mSettingsLock from './screens/10102-13496.json';
+import mServiceTools from './screens/10024-19052.json';
+import mLoadCells from './screens/10024-17659.json';
+import mAdjustment from './screens/10024-19085.json';
+import mRestart from './screens/10102-13422.json';
+import mServicePin from './screens/10024-18951.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -121,6 +173,58 @@ export const SCREENS = {
   spStepOff: spStepOff as unknown as FNode,
   spNoteWo: spNoteWo as unknown as FNode,
   spStepOffWo: spStepOffWo as unknown as FNode,
+  mMenu: mMenu as unknown as FNode,
+  mInfo: mInfo as unknown as FNode,
+  mUserManual: mUserManual as unknown as FNode,
+  mHelp: mHelp as unknown as FNode,
+  mAboutSystem: mAboutSystem as unknown as FNode,
+  mAboutVersion: mAboutVersion as unknown as FNode,
+  mAboutManufacturer: mAboutManufacturer as unknown as FNode,
+  mSettings: mSettings as unknown as FNode,
+  mDisplay1: mDisplay1 as unknown as FNode,
+  mDisplay2: mDisplay2 as unknown as FNode,
+  mLanguage1: mLanguage1 as unknown as FNode,
+  mLanguage2: mLanguage2 as unknown as FNode,
+  mLanguage3: mLanguage3 as unknown as FNode,
+  mUnits: mUnits as unknown as FNode,
+  mClearValues: mClearValues as unknown as FNode,
+  mBrightness: mBrightness as unknown as FNode,
+  mStandby: mStandby as unknown as FNode,
+  mNameFormat: mNameFormat as unknown as FNode,
+  mDateFormat: mDateFormat as unknown as FNode,
+  mBmiBsa: mBmiBsa as unknown as FNode,
+  mWeight: mWeight as unknown as FNode,
+  mAutohold: mAutohold as unknown as FNode,
+  mSensitivity: mSensitivity as unknown as FNode,
+  mTareScan: mTareScan as unknown as FNode,
+  mPretare: mPretare as unknown as FNode,
+  mNetworkOff: mNetworkOff as unknown as FNode,
+  mNetworkOn: mNetworkOn as unknown as FNode,
+  mWifiSearch: mWifiSearch as unknown as FNode,
+  mWifiList: mWifiList as unknown as FNode,
+  mServer: mServer as unknown as FNode,
+  mIdentification: mIdentification as unknown as FNode,
+  mClearData: mClearData as unknown as FNode,
+  mRs232: mRs232 as unknown as FNode,
+  mProtocol: mProtocol as unknown as FNode,
+  mAudio: mAudio as unknown as FNode,
+  mAudioLanguage: mAudioLanguage as unknown as FNode,
+  mVolume: mVolume as unknown as FNode,
+  mBattery: mBattery as unknown as FNode,
+  mService: mService as unknown as FNode,
+  mInfoDisplay: mInfoDisplay as unknown as FNode,
+  mInfoInterface: mInfoInterface as unknown as FNode,
+  mInfoWeight: mInfoWeight as unknown as FNode,
+  mInfoVerification: mInfoVerification as unknown as FNode,
+  mConfigMode: mConfigMode as unknown as FNode,
+  mCalibration: mCalibration as unknown as FNode,
+  mFactoryReset: mFactoryReset as unknown as FNode,
+  mSettingsLock: mSettingsLock as unknown as FNode,
+  mServiceTools: mServiceTools as unknown as FNode,
+  mLoadCells: mLoadCells as unknown as FNode,
+  mAdjustment: mAdjustment as unknown as FNode,
+  mRestart: mRestart as unknown as FNode,
+  mServicePin: mServicePin as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -182,5 +286,57 @@ export const FIGMA_IDS = {
   "spNote": "14531:38874",
   "spStepOff": "14531:38853",
   "spNoteWo": "14531:39023",
-  "spStepOffWo": "14531:38851"
+  "spStepOffWo": "14531:38851",
+  "mMenu": "10024:17987",
+  "mInfo": "10024:16652",
+  "mUserManual": "10049:13215",
+  "mHelp": "10049:13242",
+  "mAboutSystem": "10024:18894",
+  "mAboutVersion": "10024:18908",
+  "mAboutManufacturer": "10024:18922",
+  "mSettings": "10052:42212",
+  "mDisplay1": "10024:16725",
+  "mDisplay2": "10052:42675",
+  "mLanguage1": "10049:13269",
+  "mLanguage2": "10052:44569",
+  "mLanguage3": "10052:44690",
+  "mUnits": "10052:44848",
+  "mClearValues": "10052:45058",
+  "mBrightness": "10052:45214",
+  "mStandby": "10024:16976",
+  "mNameFormat": "10024:17021",
+  "mDateFormat": "10052:11455",
+  "mBmiBsa": "10024:17111",
+  "mWeight": "10024:17498",
+  "mAutohold": "10064:11407",
+  "mSensitivity": "10024:17159",
+  "mTareScan": "10066:11082",
+  "mPretare": "12336:22148",
+  "mNetworkOff": "10024:17249",
+  "mNetworkOn": "10024:17382",
+  "mWifiSearch": "10024:18064",
+  "mWifiList": "10024:18081",
+  "mServer": "14669:34147",
+  "mIdentification": "10024:17447",
+  "mClearData": "10024:18691",
+  "mRs232": "10024:17293",
+  "mProtocol": "10024:18696",
+  "mAudio": "10024:18741",
+  "mAudioLanguage": "12232:34689",
+  "mVolume": "10102:12544",
+  "mBattery": "10024:18831",
+  "mService": "10024:19018",
+  "mInfoDisplay": "10024:18936",
+  "mInfoInterface": "10024:18976",
+  "mInfoWeight": "10024:19004",
+  "mInfoVerification": "10024:18990",
+  "mConfigMode": "10102:13253",
+  "mCalibration": "10024:19346",
+  "mFactoryReset": "10102:13439",
+  "mSettingsLock": "10102:13496",
+  "mServiceTools": "10024:19052",
+  "mLoadCells": "10024:17659",
+  "mAdjustment": "10024:19085",
+  "mRestart": "10102:13422",
+  "mServicePin": "10024:18951"
 } as const;

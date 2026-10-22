@@ -15,7 +15,10 @@ import '../../styles/device-fonts.css';
 import { ICONS } from './icons';
 
 export type FNode = {
-  i: string;
+  /** Figma node id (menu dumps keep it only on text nodes). */
+  i?: string;
+  /** Text key (Figma string variable bound to the characters). */
+  kk?: string;
   t: 'F' | 'G' | 'T' | 'S';
   x: number;
   y: number;
@@ -69,6 +72,9 @@ function boxShadow(n: FNode): string | undefined {
   const parts: string[] = [];
   if (n.st && n.sw) {
     const w = n.sw;
+    // 'X' = gradient stroke (design system: #D3D4D7 → #AFB0B3); use its midpoint.
+    const stroke = n.st === 'X' ? '#c1c2c5' : n.st;
+    n = { ...n, st: stroke };
     if (n.sa === 'I') parts.push(`inset 0 0 0 ${w}px ${n.st}`);
     else if (n.sa === 'O') parts.push(`0 0 0 ${w}px ${n.st}`);
     else parts.push(`inset 0 0 0 ${w / 2}px ${n.st}`, `0 0 0 ${w / 2}px ${n.st}`);
@@ -111,6 +117,8 @@ function TextNode({ n, override, parentW }: { n: FNode; override?: string; paren
           whiteSpace: auto === 'W' ? 'pre' : 'pre-wrap',
           overflowWrap: 'break-word',
           lineHeight: 'normal',
+          // Strut = first run's font, so the inherited page font size cannot widen line boxes.
+          ...(content[0] ? { ...fontOf(content[0][1] as string, content[0][2] as string), fontSize: content[0][3] as number } : {}),
         }}
       >
         {content.map((run, idx) => {
@@ -132,14 +140,15 @@ function TextNode({ n, override, parentW }: { n: FNode; override?: string; paren
 }
 
 function Node({ n, o, parentW = 272 }: { n: FNode; o: ScreenOverrides; parentW?: number }) {
-  if (o.hide?.includes(n.i)) return null;
-  const click = o.onClick?.[n.i];
+  const id = n.i ?? '';
+  if (o.hide?.includes(id)) return null;
+  const click = o.onClick?.[id];
   const clickStyle: CSSProperties = click ? { cursor: 'pointer' } : {};
-  if (o.replace && n.i in o.replace) {
-    return <div style={{ position: 'absolute', left: n.x, top: n.y, width: n.w, height: n.h }} onClick={click}>{o.replace[n.i]}</div>;
+  if (o.replace && id in o.replace) {
+    return <div style={{ position: 'absolute', left: n.x, top: n.y, width: n.w, height: n.h }} onClick={click}>{o.replace[id]}</div>;
   }
   if (n.t === 'T') {
-    const t = <TextNode n={n} override={o.text?.[n.i]} parentW={parentW} />;
+    const t = <TextNode n={n} override={o.text?.[id]} parentW={parentW} />;
     return click ? <div onClick={click} style={clickStyle}>{t}</div> : t;
   }
   if (n.t === 'S') {
@@ -160,11 +169,11 @@ function Node({ n, o, parentW = 272 }: { n: FNode; o: ScreenOverrides; parentW?:
       onClick={click}
       style={{
         position: 'absolute', left: n.x, top: n.y, width: n.w, height: n.h,
-        background: o.fill?.[n.i] ?? n.f, borderRadius: radius(n.r), boxShadow: boxShadow(n),
+        background: o.fill?.[id] ?? n.f, borderRadius: radius(n.r), boxShadow: boxShadow(n),
         overflow: n.clip ? 'hidden' : undefined, opacity: n.op, ...clickStyle,
       }}
     >
-      {n.c?.map(c => <Node key={c.i} n={c} o={o} parentW={n.w} />)}
+      {n.c?.map((c, idx) => <Node key={c.i ?? idx} n={c} o={o} parentW={n.w} />)}
     </div>
   );
 }

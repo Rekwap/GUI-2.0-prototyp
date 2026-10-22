@@ -216,8 +216,6 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
             'I14531:38224;14526:9110': DEMO_PATIENT.name,
           }}
           onClick={{ 'I14531:38224;14526:9111': go('woDataSaved') }}
-          // Figma shows step 2 not yet completed here; both steps are done at this point.
-          fill={{ 'I14531:38224;14526:9107;14454:42518': '#06a94e' }}
         />
       );
 

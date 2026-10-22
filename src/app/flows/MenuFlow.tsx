@@ -42,8 +42,8 @@ const PAGES: Record<string, Page> = {
   dateFormat: { s: 'mDateFormat' },
   bmiBsa: { s: 'mBmiBsa' },
 
-  // "Pre-Tare Presets" and "Pre-tare" both open the Pre-tare frames (Figma 19525:73616).
-  weight: { s: 'mWeight', rows: ['autohold', 'pretare', 'sensitivity', 'tareScan', 'pretare'] },
+  // "Pre-Tare Presets" removed (menu structure 30.06 lists only Pre-tare).
+  weight: { s: 'mWeight', rows: ['autohold', 'sensitivity', 'tareScan', 'pretare'] },
   autohold: { s: 'mAutohold', hits: [YESNO_96] },
   sensitivity: { s: 'mSensitivity' },
   tareScan: { s: 'mTareScan' },

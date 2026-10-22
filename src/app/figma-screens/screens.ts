@@ -56,6 +56,10 @@ import saNote from './screens/14524-31162.json';
 import saStepOff from './screens/14531-39002.json';
 import saNoteWo from './screens/14529-37196.json';
 import saStepOffWo from './screens/14529-37194.json';
+import spNote from './screens/14531-38874.json';
+import spStepOff from './screens/14531-38853.json';
+import spNoteWo from './screens/14531-39023.json';
+import spStepOffWo from './screens/14531-38851.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -113,6 +117,10 @@ export const SCREENS = {
   saStepOff: saStepOff as unknown as FNode,
   saNoteWo: saNoteWo as unknown as FNode,
   saStepOffWo: saStepOffWo as unknown as FNode,
+  spNote: spNote as unknown as FNode,
+  spStepOff: spStepOff as unknown as FNode,
+  spNoteWo: spNoteWo as unknown as FNode,
+  spStepOffWo: spStepOffWo as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -170,5 +178,9 @@ export const FIGMA_IDS = {
   "saNote": "14524:31162",
   "saStepOff": "14531:39002",
   "saNoteWo": "14529:37196",
-  "saStepOffWo": "14529:37194"
+  "saStepOffWo": "14529:37194",
+  "spNote": "14531:38874",
+  "spStepOff": "14531:38853",
+  "spNoteWo": "14531:39023",
+  "spStepOffWo": "14531:38851"
 } as const;

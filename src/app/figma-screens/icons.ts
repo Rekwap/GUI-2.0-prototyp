@@ -1,6 +1,7 @@
 // Generated from the Figma handover — do not edit by hand.
 
 import i10v66di from './icons/i10v66di.svg';
+import i13jtjbl from './icons/i13jtjbl.svg';
 import i142tr39 from './icons/i142tr39.svg';
 import i14njea9 from './icons/i14njea9.svg';
 import i172jp08 from './icons/i172jp08.svg';
@@ -27,6 +28,7 @@ import i1w5nz6d from './icons/i1w5nz6d.svg';
 import i1xnnk1p from './icons/i1xnnk1p.svg';
 import i50rwii from './icons/i50rwii.svg';
 import i52p5y from './icons/i52p5y.svg';
+import i72822y from './icons/i72822y.svg';
 import i92gran from './icons/i92gran.svg';
 import i93f8jz from './icons/i93f8jz.svg';
 import ibswn7v from './icons/ibswn7v.svg';
@@ -53,6 +55,7 @@ import iz2roop from './icons/iz2roop.svg';
 
 export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i10v66di: { src: i10v66di, w: 80, h: 80 },
+  i13jtjbl: { src: i13jtjbl, w: 80, h: 80 },
   i142tr39: { src: i142tr39, w: 252, h: 68 },
   i14njea9: { src: i14njea9, w: 80, h: 80 },
   i172jp08: { src: i172jp08, w: 40, h: 40 },
@@ -79,6 +82,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i1xnnk1p: { src: i1xnnk1p, w: 252, h: 142 },
   i50rwii: { src: i50rwii, w: 80, h: 80 },
   i52p5y: { src: i52p5y, w: 24, h: 24 },
+  i72822y: { src: i72822y, w: 80, h: 80 },
   i92gran: { src: i92gran, w: 24, h: 24 },
   i93f8jz: { src: i93f8jz, w: 235, h: 52 },
   ibswn7v: { src: ibswn7v, w: 24, h: 24 },

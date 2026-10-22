@@ -842,8 +842,8 @@ function AppContent() {
   const [serverAddress, setServerAddress] = useState('');
   const [serverPort, setServerPort] = useState('');
   
-  // Installation mode: 'integrated' | 'standalone'
-  const [installationMode, setInstallationMode] = useState<'integrated' | 'standalone'>('integrated');
+  // Installation mode: integrated (EMR, default) | stand-alone | simple print
+  const [installationMode, setInstallationMode] = useState<'integrated' | 'standalone' | 'simpleprint'>('integrated');
   // Start screen "Choose mode": guided (professional) measurement or self-measurement.
   const [deviceMode, setDeviceMode] = useState<'choose' | 'guided' | 'self'>('choose');
   // Stand-alone: CONFIRM opens the "Integration" info screen (QR code).
@@ -1259,7 +1259,7 @@ function AppContent() {
   };
 
   const handleSendClick = () => {
-    if (installationMode === 'standalone') {
+    if (installationMode !== 'integrated') {
       setShowStandaloneInfo(true);
       return;
     }
@@ -1622,7 +1622,7 @@ function AppContent() {
                 heightCm={parseFloat(testHeight) || 0}
                 isMetric={isMetric}
                 heightRequired={heightRequired}
-                integrated={installationMode !== 'standalone'}
+                installation={installationMode}
                 formatImperialHeight={convertCmToFeetInches}
               />}
         </div>
@@ -2717,7 +2717,7 @@ function AppContent() {
                 onRemoveTare: handleRemoveTare,
               }}
               height={height}
-              buttons={{ onTare: handleTareClick, onRecall: handleRecallClick, onConfirm: handleSendClick, standalone: installationMode === 'standalone' }}
+              buttons={{ onTare: handleTareClick, onRecall: handleRecallClick, onConfirm: handleSendClick, standalone: installationMode !== 'integrated' }}
             />
           );
         })()}

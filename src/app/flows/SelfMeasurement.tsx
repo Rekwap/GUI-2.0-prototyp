@@ -2,7 +2,8 @@
 // "07.05.2026" and "23.04.2026_Overview variants" → weight only), configuration:
 // integrated, ultrasonic, login patient only, no persistent pre-tare;
 // "Height Required" switches between the weight + height and the weight-only flow;
-// stand-alone (not integrated): no barcode scan, results are noted down by the patient. Screens are 1:1 Figma exports;
+// stand-alone / simple print (not integrated): no barcode scan, results are noted
+// down by the patient resp. printed. Screens are 1:1 Figma exports;
 // this file only adds behaviour and timing.
 import { useEffect, useRef, useState } from 'react';
 import { FigmaScreen, HitArea } from '../figma-screens/FigmaScreen';
@@ -37,7 +38,8 @@ type Step =
   | 'postureBad' | 'postureOk' | 'countdown' | 'heightProgress' | 'heightDone' | 'yourHeight'
   | 'overview' | 'sending' | 'ok' | 'dataSaved'
   | 'woSending' | 'woOk' | 'woDataSaved'
-  | 'saNote' | 'saStepOff' | 'saNoteWo' | 'saStepOffWo';
+  | 'saNote' | 'saStepOff' | 'saNoteWo' | 'saStepOffWo'
+  | 'spNote' | 'spStepOff' | 'spNoteWo' | 'spStepOffWo';
 
 /** Automatic transitions (ms) as annotated in Figma. */
 const AUTO: Partial<Record<Step, [number, Step]>> = {
@@ -53,6 +55,8 @@ const AUTO: Partial<Record<Step, [number, Step]>> = {
   woDataSaved: [3000, 'start'],
   saStepOff: [3000, 'start'],
   saStepOffWo: [3000, 'start'],
+  spStepOff: [3000, 'start'],
+  spStepOffWo: [3000, 'start'],
 };
 
 export type SelfMeasurementProps = {
@@ -62,8 +66,8 @@ export type SelfMeasurementProps = {
   isMetric: boolean;
   /** Height required: weight + height flow; otherwise weight only. */
   heightRequired: boolean;
-  /** Integrated (EMR): barcode login + sending. Stand-alone: note down result. */
-  integrated: boolean;
+  /** Integrated (EMR): barcode login + sending. Stand-alone: note down result. Simple print: printout. */
+  installation: 'integrated' | 'standalone' | 'simpleprint';
   formatImperialHeight: (cm: string) => string;
 };
 
@@ -77,7 +81,9 @@ function RepeatNext({ onRepeat, onNext }: { onRepeat: () => void; onNext: () => 
   );
 }
 
-export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequired, integrated, formatImperialHeight }: SelfMeasurementProps) {
+export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequired, installation, formatImperialHeight }: SelfMeasurementProps) {
+  const integrated = installation === 'integrated';
+  const print = installation === 'simpleprint';
   const [step, setStep] = useState<Step>('start');
   const [shownKg, setShownKg] = useState(0);
   const [count, setCount] = useState(3);
@@ -165,7 +171,7 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
         const p = 'I14529:37769;14217:74274;';
         return (
           <FigmaScreen data={SCREENS.woYourWeight} text={{ [p + '13202:63011']: w(weightKg), [p + '13202:63009']: wUnit }}>
-            <RepeatNext onRepeat={go('weigh')} onNext={go(integrated ? 'woSending' : 'saNoteWo')} />
+            <RepeatNext onRepeat={go('weigh')} onNext={go(integrated ? 'woSending' : print ? 'spNoteWo' : 'saNoteWo')} />
           </FigmaScreen>
         );
       }
@@ -229,7 +235,7 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
       const p = 'I14218:30980;14217:74774;';
       return (
         <FigmaScreen data={SCREENS.smYourHeight} text={{ [p + '13202:63011']: h, [p + '13202:63009']: hUnit }}>
-          <RepeatNext onRepeat={go('postureBad')} onNext={go(integrated ? 'overview' : 'saNote')} />
+          <RepeatNext onRepeat={go('postureBad')} onNext={go(integrated ? 'overview' : print ? 'spNote' : 'saNote')} />
         </FigmaScreen>
       );
     }
@@ -287,5 +293,30 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
 
     case 'saStepOffWo':
       return <FigmaScreen data={SCREENS.saStepOffWo} />;
+    case 'spNote': {
+      const p = 'I14531:38875;13202:62980;';
+      return (
+        <FigmaScreen
+          data={SCREENS.spNote}
+          text={{ [p + '13202:62961']: w(weightKg), [p + '13202:62958']: wUnit, [p + '13202:62952']: h, [p + '13202:62957']: hUnit }}
+          onClick={{ 'I14531:38875;14087:39278': go('spStepOff') }}
+        />
+      );
+    }
+
+    case 'spNoteWo':
+      return (
+        <FigmaScreen
+          data={SCREENS.spNoteWo}
+          text={{ 'I14531:39024;14526:9108;13202:63011': w(weightKg), 'I14531:39024;14526:9108;13202:63009': wUnit }}
+          onClick={{ 'I14531:39024;14526:9111': go('spStepOffWo') }}
+        />
+      );
+
+    case 'spStepOff':
+      return <FigmaScreen data={SCREENS.spStepOff} />;
+
+    case 'spStepOffWo':
+      return <FigmaScreen data={SCREENS.spStepOffWo} />;
   }
 }

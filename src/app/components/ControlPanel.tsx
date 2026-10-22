@@ -8,8 +8,8 @@ interface ControlPanelProps {
   onHeightModeChange: (mode: 'manual' | 'ultrasonic' | 'tactile') => void;
   heightRequired: boolean;
   onHeightRequiredChange: (required: boolean) => void;
-  installationMode: 'integrated' | 'standalone';
-  onInstallationModeChange: (mode: 'integrated' | 'standalone') => void;
+  installationMode: 'integrated' | 'standalone' | 'simpleprint';
+  onInstallationModeChange: (mode: 'integrated' | 'standalone' | 'simpleprint') => void;
   isMetric: boolean;
   onIsMetricChange: (metric: boolean) => void;
   loginMode: 'user-only' | 'patient-only' | 'both';
@@ -78,13 +78,32 @@ export default function ControlPanel({
             <Switch id={`height-required${uniqueId}`} checked={heightRequired} onCheckedChange={onHeightRequiredChange} />
             <Label htmlFor={`height-required${uniqueId}`}>Height Required</Label>
           </div>
-          <div className="flex items-center space-x-2">
-            <Switch id={`installation-mode${uniqueId}`} checked={installationMode === 'standalone'} onCheckedChange={(checked) => onInstallationModeChange(checked ? 'standalone' : 'integrated')} />
-            <Label htmlFor={`installation-mode${uniqueId}`}>Stand Alone</Label>
-          </div>
+
           <div className="flex items-center space-x-2">
             <Switch id={`unit-system${uniqueId}`} checked={!isMetric} onCheckedChange={(checked) => onIsMetricChange(!checked)} />
             <Label htmlFor={`unit-system${uniqueId}`}>Imperial (lbs / ft'in)</Label>
+          </div>
+        </div>
+
+        {/* Separator */}
+        <div className="border-t" />
+
+        {/* Installation Section */}
+        <div className="flex flex-col gap-2">
+          <Label>Installation</Label>
+          <div className="flex flex-col gap-1">
+            {([['integrated', 'Integrated'], ['standalone', 'Stand Alone'], ['simpleprint', 'Simple Print']] as const).map(([value, label]) => (
+              <div key={value} className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id={`installation-${value}${uniqueId}`}
+                  name={`installation${uniqueId}`}
+                  checked={installationMode === value}
+                  onChange={() => onInstallationModeChange(value)}
+                />
+                <Label htmlFor={`installation-${value}${uniqueId}`}>{label}</Label>
+              </div>
+            ))}
           </div>
         </div>
 

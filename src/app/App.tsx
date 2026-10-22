@@ -719,7 +719,7 @@ function TaraValueInfo({ taredWeight, preTareValues, onRemove, isMetric }: { tar
   }
   
   const kgToLbs = (kg: number): number => kg * 2.20462;
-  const displayValue = isMetric ? totalTare.toFixed(2) : kgToLbs(totalTare).toFixed(1);
+  const displayValue = isMetric ? totalTare.toFixed(2) : kgToLbs(totalTare).toFixed(2);
   const unit = isMetric ? 'kg' : 'lbs';
   
   return (
@@ -2680,7 +2680,7 @@ function AppContent() {
           // Empty scale with persistent pre-tare: the reading shows the deduction as a negative net value.
           const emptyPt = ptActive && parseFloat(rawWeight) === 0;
           const ptOnly = ptActive && totalTare === persistentKg;
-          const tareText = totalTare === 0 ? null : `-${isMetric ? totalTare.toFixed(2) : kgToLbs(totalTare).toFixed(1)} ${isMetric ? 'kg' : 'lbs'}`;
+          const tareText = totalTare === 0 ? null : `-${isMetric ? totalTare.toFixed(2) : kgToLbs(totalTare).toFixed(2)} ${isMetric ? 'kg' : 'lbs'}`;
           const login: LoginBanner =
             loginMode === 'both' && (isUserLoggedIn || isPatientLoggedIn)
               ? { kind: 'both', patientOnline: isPatientLoggedIn, userOnline: isUserLoggedIn }

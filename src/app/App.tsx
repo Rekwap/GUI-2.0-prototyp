@@ -26,7 +26,6 @@ import StatusBarPortrait34583 from "./imports/StatusBarPortrait-3-4583";
 import ScanBothIds from "./imports/ScanBothIds";
 import StatusBarPortraitBoth from "./imports/StatusBarPortraitBoth";
 import HeightCalibration from "./components/HeightCalibration";
-import IntegrationInfo from "./components/IntegrationInfo";
 import Network from "./components/Network";
 import ServerConnection from "./components/ServerConnection";
 import TactileHeight from "./components/TactileHeight";
@@ -51,7 +50,7 @@ import DialogRestartComponent from './imports/DialogRestart';
 import BmiBsaMenu from './components/BmiBsaMenu';
 import { MainScreen, type HeightPanelProps, type LoginBanner } from './main-screen/MainScreen';
 import { TareAssistant } from './flows/TareAssistant';
-import { RecallScreen, ScanIdScreen, IdConfirmedScreen, OverviewScreen, TransmittingScreen, DataSavedScreen } from './flows/SendFlow';
+import { RecallScreen, ScanIdScreen, IdConfirmedScreen, OverviewScreen, TransmittingScreen, DataSavedScreen, IntegrationInfoScreen } from './flows/SendFlow';
 
 // Wrapper component for consistent layout
 function ScreenWrapper({ children, controls }: { children: React.ReactNode; controls: React.ReactNode}) {
@@ -844,6 +843,8 @@ function AppContent() {
   
   // Installation mode: 'integrated' | 'standalone'
   const [installationMode, setInstallationMode] = useState<'integrated' | 'standalone'>('integrated');
+  // Stand-alone: CONFIRM opens the "Integration" info screen (QR code).
+  const [showStandaloneInfo, setShowStandaloneInfo] = useState(false);
   
   // Unit system: 'metric' | 'imperial'
   const [isMetric, setIsMetric] = useState(true);
@@ -1254,6 +1255,10 @@ function AppContent() {
   };
 
   const handleSendClick = () => {
+    if (installationMode === 'standalone') {
+      setShowStandaloneInfo(true);
+      return;
+    }
     // Check if we're logged in (if required)
     if (!isLoggedIn) {
       if (loginMode === 'both') {
@@ -1479,10 +1484,6 @@ function AppContent() {
   const handleIntegrationInfoBack = () => {
     setShowIntegrationInfo(false);
     setShowMenu(true);
-  };
-
-  const handleIntegrationInfoHome = () => {
-    setShowIntegrationInfo(false);
   };
 
   const handleNetworkBack = () => {
@@ -1787,10 +1788,7 @@ function AppContent() {
             transformOrigin: 'center center'
           }}
         >
-          <IntegrationInfo 
-            onBack={handleIntegrationInfoBack}
-            onHome={handleIntegrationInfoHome}
-          />
+          <IntegrationInfoScreen onBack={handleIntegrationInfoBack} />
         </div>
         {showControlPanel && (
           <ControlPanel 
@@ -2235,6 +2233,45 @@ function AppContent() {
     );
   }
 
+  if (showStandaloneInfo) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
+        <div 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
+          data-name="Integration"
+          style={{ 
+            transform: `scale(${zoomLevel / 100})`,
+            transformOrigin: 'center center'
+          }}
+        >
+          <IntegrationInfoScreen onBack={() => setShowStandaloneInfo(false)} />
+        </div>
+        {showControlPanel && (
+          <ControlPanel 
+            heightMode={heightMode}
+            onHeightModeChange={setHeightMode}
+            heightRequired={heightRequired}
+            onHeightRequiredChange={setHeightRequired}
+            installationMode={installationMode}
+            onInstallationModeChange={(m) => { setInstallationMode(m); if (m === 'integrated') setShowStandaloneInfo(false); }}
+            isMetric={isMetric}
+            onIsMetricChange={setIsMetric}
+            loginMode={loginMode}
+            onLoginModeChange={setLoginMode}
+            testHeight={testHeight}
+            onTestHeightChange={setTestHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
+            uniqueId="-integration"
+            onReset={handleReset}
+            zoomLevel={zoomLevel}
+            onZoomLevelChange={setZoomLevel}
+          />
+        )}
+      </div>
+    );
+  }
+
   if (directLogin) {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
@@ -2623,7 +2660,7 @@ function AppContent() {
                 onRemoveTare: handleRemoveTare,
               }}
               height={height}
-              buttons={{ onTare: handleTareClick, onRecall: handleRecallClick, onConfirm: handleSendClick }}
+              buttons={{ onTare: handleTareClick, onRecall: handleRecallClick, onConfirm: handleSendClick, standalone: installationMode === 'standalone' }}
             />
           );
         })()}

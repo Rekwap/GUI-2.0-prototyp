@@ -25,6 +25,7 @@ import scanUser from './screens/10657-11671.json';
 import userId from './screens/10657-12140.json';
 import transmitting from './screens/10686-27528.json';
 import dataSaved from './screens/10628-11469.json';
+import integration from './screens/11178-31354.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -51,6 +52,7 @@ export const SCREENS = {
   userId: userId as unknown as FNode,
   transmitting: transmitting as unknown as FNode,
   dataSaved: dataSaved as unknown as FNode,
+  integration: integration as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -77,5 +79,6 @@ export const FIGMA_IDS = {
   "scanUser": "10657:11671",
   "userId": "10657:12140",
   "transmitting": "10686:27528",
-  "dataSaved": "10628:11469"
+  "dataSaved": "10628:11469",
+  "integration": "11178:31354"
 } as const;

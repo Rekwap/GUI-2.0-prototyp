@@ -3,6 +3,7 @@
 // only maps state onto them.
 import { FigmaNode, FigmaScreen, HitArea, findNode } from '../figma-screens/FigmaScreen';
 import { SCREENS } from '../figma-screens/screens';
+import qrIntegration from '../figma-screens/assets/qr-integration@4x.png';
 
 const KG_TO_LBS = 2.20462;
 
@@ -132,4 +133,22 @@ export function TransmittingScreen() {
 
 export function DataSavedScreen() {
   return <FigmaScreen data={SCREENS.dataSaved} />;
+}
+
+/* ------------------------------------------------------------------ */
+/* Stand-alone: CONFIRM → Integration info (no EMR connection)          */
+/* ------------------------------------------------------------------ */
+
+export function IntegrationInfoScreen({ onBack }: { onBack: () => void }) {
+  const p = 'I11178:31354;';
+  return (
+    <FigmaScreen
+      data={SCREENS.integration}
+      onClick={{ [p + '10049:14366;10008:1414']: onBack }}
+      replace={{
+        // QR code is a raster image in Figma: original rendered at 4x.
+        [p + '10020:1503']: <img src={qrIntegration} alt="QR code www.seca.com/integration" draggable={false} style={{ display: 'block', width: 164, height: 164, maxWidth: 'none' }} />,
+      }}
+    />
+  );
 }

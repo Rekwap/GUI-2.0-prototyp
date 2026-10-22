@@ -7,6 +7,7 @@ import i1bf7dg9 from './icons/i1bf7dg9.svg';
 import i1ekoz5x from './icons/i1ekoz5x.svg';
 import i1evdmji from './icons/i1evdmji.svg';
 import i1i5tp6h from './icons/i1i5tp6h.svg';
+import i1ipebnm from './icons/i1ipebnm.svg';
 import i1ljtby6 from './icons/i1ljtby6.svg';
 import i1n4k4p0 from './icons/i1n4k4p0.svg';
 import i1qlseln from './icons/i1qlseln.svg';
@@ -37,6 +38,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i1ekoz5x: { src: i1ekoz5x, w: 48, h: 32 },
   i1evdmji: { src: i1evdmji, w: 48, h: 32 },
   i1i5tp6h: { src: i1i5tp6h, w: 268, h: 68 },
+  i1ipebnm: { src: i1ipebnm, w: 50, h: 50 },
   i1ljtby6: { src: i1ljtby6, w: 96, h: 24 },
   i1n4k4p0: { src: i1n4k4p0, w: 62, h: 48 },
   i1qlseln: { src: i1qlseln, w: 48, h: 32 },

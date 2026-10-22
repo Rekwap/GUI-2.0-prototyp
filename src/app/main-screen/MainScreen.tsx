@@ -22,6 +22,7 @@ import buttonBarBg from './assets/icons/buttonBar.svg';
 import tare48Icon from './assets/icons/tare48.svg';
 import recall48Icon from './assets/icons/recall48.svg';
 import send48Icon from './assets/icons/send48.svg';
+import send48StandaloneIcon from './assets/icons/send48Standalone.svg';
 import heightButton from './assets/icons/heightButton.svg';
 import stepsIcon from './assets/icons/steps@4x.png';
 
@@ -237,6 +238,8 @@ export type ButtonBarProps = {
   onTare?: () => void;
   onRecall?: () => void;
   onConfirm?: () => void;
+  /** Stand-alone version: CONFIRM is shown like the other buttons (not highlighted). */
+  standalone?: boolean;
 };
 
 function BarButton({ x, icon, label, active, onClick }: { x: number; icon: string; label: string; active?: boolean; onClick?: () => void }) {
@@ -252,13 +255,13 @@ function BarButton({ x, icon, label, active, onClick }: { x: number; icon: strin
   );
 }
 
-export function ButtonBar({ onTare, onRecall, onConfirm }: ButtonBarProps) {
+export function ButtonBar({ onTare, onRecall, onConfirm, standalone }: ButtonBarProps) {
   return (
     <Box x={0} y={408} w={272} h={72} style={{ background: COLORS.white }}>
       <Icon src={buttonBarBg} x={0} y={0} w={272} h={72} />
       <BarButton x={12} icon={tare48Icon} label="TARE" onClick={onTare} />
       <BarButton x={95} icon={recall48Icon} label="RECALL" onClick={onRecall} />
-      <BarButton x={178} icon={send48Icon} label="CONFIRM" active onClick={onConfirm} />
+      <BarButton x={178} icon={standalone ? send48StandaloneIcon : send48Icon} label="CONFIRM" active={!standalone} onClick={onConfirm} />
     </Box>
   );
 }

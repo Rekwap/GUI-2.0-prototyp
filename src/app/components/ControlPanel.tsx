@@ -75,7 +75,7 @@ export default function ControlPanel({
           </div>
           <div className="flex items-center space-x-2">
             <Switch id={`installation-mode${uniqueId}`} checked={installationMode === 'standalone'} onCheckedChange={(checked) => onInstallationModeChange(checked ? 'standalone' : 'integrated')} />
-            <Label htmlFor={`installation-mode${uniqueId}`}>Stand Alone (Send disabled)</Label>
+            <Label htmlFor={`installation-mode${uniqueId}`}>Stand Alone</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Switch id={`unit-system${uniqueId}`} checked={!isMetric} onCheckedChange={(checked) => onIsMetricChange(!checked)} />

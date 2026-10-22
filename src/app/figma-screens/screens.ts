@@ -114,6 +114,7 @@ import mRestart from './screens/10102-13422.json';
 import mServicePin from './screens/10024-18951.json';
 import mPretareKeypad from './screens/13061-26953.json';
 import mPretareSet from './screens/13061-27010.json';
+import deviceModePt from './screens/14010-59908.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -229,6 +230,7 @@ export const SCREENS = {
   mServicePin: mServicePin as unknown as FNode,
   mPretareKeypad: mPretareKeypad as unknown as FNode,
   mPretareSet: mPretareSet as unknown as FNode,
+  deviceModePt: deviceModePt as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -344,5 +346,6 @@ export const FIGMA_IDS = {
   "mRestart": "10102:13422",
   "mServicePin": "10024:18951",
   "mPretareKeypad": "13061:26953",
-  "mPretareSet": "13061:27010"
+  "mPretareSet": "13061:27010",
+  "deviceModePt": "14010:59908"
 } as const;

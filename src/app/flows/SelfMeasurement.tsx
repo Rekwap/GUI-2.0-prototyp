@@ -13,7 +13,17 @@ import { DEMO_PATIENT } from './SendFlow';
 const KG_TO_LBS = 2.20462;
 
 /** Device mode: Guided (professional) vs. Self-Measurement. */
-export function DeviceModeScreen({ onGuided, onSelf }: { onGuided: () => void; onSelf: () => void }) {
+export function DeviceModeScreen({ onGuided, onSelf, pretareText }: { onGuided: () => void; onSelf: () => void; pretareText?: string }) {
+  // With persistent pre-tare: variant with the "Pre-tare" footer (Figma 14010:59908).
+  if (pretareText) {
+    return (
+      <FigmaScreen
+        data={SCREENS.deviceModePt}
+        text={{ 'I14010:59909;12922:60431': pretareText }}
+        onClick={{ 'I14010:59909;12922:60657': onGuided, 'I14010:59909;12922:60686': onSelf }}
+      />
+    );
+  }
   return (
     <FigmaScreen
       data={SCREENS.deviceMode}

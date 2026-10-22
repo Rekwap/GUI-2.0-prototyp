@@ -1649,7 +1649,7 @@ function AppContent() {
           }}
         >
           {deviceMode === 'choose'
-            ? <DeviceModeScreen onGuided={() => setDeviceMode('guided')} onSelf={() => setDeviceMode('self')} />
+            ? <DeviceModeScreen onGuided={() => setDeviceMode('guided')} onSelf={() => setDeviceMode('self')} pretareText={persistentKg > 0 ? `${(isMetric ? persistentKg : kgToLbs(persistentKg)).toFixed(2)} ${isMetric ? 'kg' : 'lbs'}` : undefined} />
             : <SelfMeasurementFlow
                 weightKg={(parseFloat(testWeight) || 0) - persistentKg}
                 pretareKg={persistentKg}

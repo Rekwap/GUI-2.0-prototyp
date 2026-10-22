@@ -3,9 +3,11 @@
 import i142tr39 from './icons/i142tr39.svg';
 import i14njea9 from './icons/i14njea9.svg';
 import i172jp08 from './icons/i172jp08.svg';
+import i17xkcfq from './icons/i17xkcfq.svg';
 import i1bf7dg9 from './icons/i1bf7dg9.svg';
 import i1ekoz5x from './icons/i1ekoz5x.svg';
 import i1evdmji from './icons/i1evdmji.svg';
+import i1fvdn15 from './icons/i1fvdn15.svg';
 import i1i5tp6h from './icons/i1i5tp6h.svg';
 import i1ipebnm from './icons/i1ipebnm.svg';
 import i1ljtby6 from './icons/i1ljtby6.svg';
@@ -28,6 +30,7 @@ import iokxo3m from './icons/iokxo3m.svg';
 import ipj5bwi from './icons/ipj5bwi.svg';
 import isvyxt8 from './icons/isvyxt8.svg';
 import iujkas9 from './icons/iujkas9.svg';
+import ixc4pn from './icons/ixc4pn.svg';
 import ixsthj1 from './icons/ixsthj1.svg';
 import ixw166 from './icons/ixw166.svg';
 import iy1f983 from './icons/iy1f983.svg';
@@ -38,9 +41,11 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i142tr39: { src: i142tr39, w: 252, h: 68 },
   i14njea9: { src: i14njea9, w: 80, h: 80 },
   i172jp08: { src: i172jp08, w: 40, h: 40 },
+  i17xkcfq: { src: i17xkcfq, w: 24, h: 24 },
   i1bf7dg9: { src: i1bf7dg9, w: 268, h: 68 },
   i1ekoz5x: { src: i1ekoz5x, w: 48, h: 32 },
   i1evdmji: { src: i1evdmji, w: 48, h: 32 },
+  i1fvdn15: { src: i1fvdn15, w: 60, h: 60 },
   i1i5tp6h: { src: i1i5tp6h, w: 268, h: 68 },
   i1ipebnm: { src: i1ipebnm, w: 50, h: 50 },
   i1ljtby6: { src: i1ljtby6, w: 96, h: 24 },
@@ -63,6 +68,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   ipj5bwi: { src: ipj5bwi, w: 140, h: 50 },
   isvyxt8: { src: isvyxt8, w: 80, h: 80 },
   iujkas9: { src: iujkas9, w: 80, h: 80 },
+  ixc4pn: { src: ixc4pn, w: 60, h: 60 },
   ixsthj1: { src: ixsthj1, w: 50, h: 50 },
   ixw166: { src: ixw166, w: 272, h: 72 },
   iy1f983: { src: iy1f983, w: 272, h: 50 },

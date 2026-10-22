@@ -29,6 +29,7 @@ import HeightCalibration from "./components/HeightCalibration";
 import Network from "./components/Network";
 import ServerConnection from "./components/ServerConnection";
 import { TactileHeightScreen } from "./flows/TactileHeight";
+import { DeviceModeScreen, StepOnScaleScreen } from "./flows/SelfMeasurement";
 import HeightConfirmation from "./components/HeightConfirmation";
 import TactileHeightMeasurementComplete from "./components/TactileHeightMeasurementComplete";
 import ControlPanel from "./components/ControlPanel";
@@ -843,6 +844,8 @@ function AppContent() {
   
   // Installation mode: 'integrated' | 'standalone'
   const [installationMode, setInstallationMode] = useState<'integrated' | 'standalone'>('integrated');
+  // Start screen "Choose mode": guided (professional) measurement or self-measurement.
+  const [deviceMode, setDeviceMode] = useState<'choose' | 'guided' | 'self'>('choose');
   // Stand-alone: CONFIRM opens the "Integration" info screen (QR code).
   const [showStandaloneInfo, setShowStandaloneInfo] = useState(false);
   
@@ -1506,6 +1509,7 @@ function AppContent() {
   };
 
   const handleReset = () => {
+    setDeviceMode('choose');
     setWeight('0.00');
     setMotherMode(false);
     setRawWeight('0.00');
@@ -1600,6 +1604,47 @@ function AppContent() {
   };
 
   // Show different screens based on state
+  if (deviceMode !== 'guided') {
+    return (
+      <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
+        <div 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
+          data-name={deviceMode === 'choose' ? 'Device Mode' : 'Self-Measurement'}
+          style={{ 
+            transform: `scale(${zoomLevel / 100})`,
+            transformOrigin: 'center center'
+          }}
+        >
+          {deviceMode === 'choose'
+            ? <DeviceModeScreen onGuided={() => setDeviceMode('guided')} onSelf={() => setDeviceMode('self')} />
+            : <StepOnScaleScreen />}
+        </div>
+        {showControlPanel && (
+          <ControlPanel 
+            heightMode={heightMode}
+            onHeightModeChange={setHeightMode}
+            heightRequired={heightRequired}
+            onHeightRequiredChange={setHeightRequired}
+            installationMode={installationMode}
+            onInstallationModeChange={setInstallationMode}
+            isMetric={isMetric}
+            onIsMetricChange={setIsMetric}
+            loginMode={loginMode}
+            onLoginModeChange={setLoginMode}
+            testHeight={testHeight}
+            onTestHeightChange={setTestHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
+            uniqueId="-device"
+            onReset={handleReset}
+            zoomLevel={zoomLevel}
+            onZoomLevelChange={setZoomLevel}
+          />
+        )}
+      </div>
+    );
+  }
+
   if (showMenu) {
     return (
       <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>

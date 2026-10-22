@@ -28,6 +28,8 @@ import dataSaved from './screens/10628-11469.json';
 import integration from './screens/11178-31354.json';
 import tactileMetric from './screens/11178-33011.json';
 import tactileImperial from './screens/11168-24415.json';
+import deviceMode from './screens/14010-59910.json';
+import stepOnScale from './screens/14010-59947.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -57,6 +59,8 @@ export const SCREENS = {
   integration: integration as unknown as FNode,
   tactileMetric: tactileMetric as unknown as FNode,
   tactileImperial: tactileImperial as unknown as FNode,
+  deviceMode: deviceMode as unknown as FNode,
+  stepOnScale: stepOnScale as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -86,5 +90,7 @@ export const FIGMA_IDS = {
   "dataSaved": "10628:11469",
   "integration": "11178:31354",
   "tactileMetric": "11178:33011",
-  "tactileImperial": "11168:24415"
+  "tactileImperial": "11168:24415",
+  "deviceMode": "14010:59910",
+  "stepOnScale": "14010:59947"
 } as const;

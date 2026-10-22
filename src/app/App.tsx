@@ -876,6 +876,7 @@ function AppContent() {
   
   // Control Panel visibility (visible by default)
   const [showControlPanel, setShowControlPanel] = useState(true);
+  const [pretare, setPretare] = useState('');
   
   // Previous value screen state
   const [showPreviousValue, setShowPreviousValue] = useState(false);
@@ -1653,6 +1654,8 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             uniqueId="-device"
@@ -1696,6 +1699,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-menu"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1738,6 +1743,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-calibration"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1777,6 +1784,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-integration"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1821,6 +1830,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-network"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1867,6 +1878,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-server"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1914,6 +1927,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-tactile"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1958,6 +1973,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-tactile-complete"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2003,6 +2020,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-confirmation"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2066,6 +2085,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-tare"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2110,6 +2131,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-manual-tare"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2155,6 +2178,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-manual-height"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2197,6 +2222,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-height-required"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2234,6 +2261,8 @@ function AppContent() {
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             uniqueId="-integration"
@@ -2275,6 +2304,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-direct-login"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2314,6 +2345,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-scan-patient"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2353,6 +2386,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-patient-id"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2392,6 +2427,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-scan-user"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2431,6 +2468,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-user-id"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2475,6 +2514,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-both-ids"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2522,6 +2563,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-overview"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2561,6 +2604,8 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
             uniqueId="-data-saved"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2690,6 +2735,8 @@ function AppContent() {
           testWeight={testWeight}
           onTestWeightChange={handleTestWeightChange}
           onTestHeightChange={setTestHeight}
+            pretare={pretare}
+            onPretareChange={setPretare}
           uniqueId="-main"
             printing={printing}
           onScanBarcode={handleBarcodeScan}

@@ -18,6 +18,9 @@ interface ControlPanelProps {
   onTestHeightChange: (height: string) => void;
   testWeight?: string;
   onTestWeightChange?: (weight: string) => void;
+  /** Global pre-tare (kg), applied before every measurement. Empty = off. */
+  pretare?: string;
+  onPretareChange?: (kg: string) => void;
   uniqueId?: string;
   onReset?: () => void;
   zoomLevel?: number;
@@ -62,6 +65,8 @@ export default function ControlPanel({
   onTestHeightChange,
   testWeight,
   onTestWeightChange,
+  pretare,
+  onPretareChange,
   uniqueId = '',
   onReset,
   zoomLevel = 100,
@@ -199,33 +204,48 @@ export default function ControlPanel({
         {/* Separator */}
         <div className="border-t" />
 
-        {/* Test Weight Section */}
-        {onTestWeightChange && (
-          <div className="flex flex-col gap-2">
-            <Label htmlFor={`test-weight${uniqueId}`}>Test Weight (kg)</Label>
-            <Input 
-              type="text" 
+        {/* Test values: weight, height, global pre-tare */}
+        <div className="grid grid-cols-3 gap-2">
+          {onTestWeightChange && (
+          <div className="flex flex-col gap-1 min-w-0">
+            <Label htmlFor={`test-weight${uniqueId}`} className="text-xs">Weight (kg)</Label>
+            <Input
+              type="text"
               inputMode="decimal"
               id={`test-weight${uniqueId}`}
               value={testWeight || ''}
               onChange={(e) => onTestWeightChange(e.target.value)}
               placeholder="54.80"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-8 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-        )}
-
-        {/* Test Height Section */}
-        <div className="flex flex-col gap-2">
-          <Label htmlFor={`test-height${uniqueId}`}>Test Height (cm)</Label>
-          <Input 
-            type="text" 
-            id={`test-height${uniqueId}`}
-            value={testHeight || ''}
-            onChange={(e) => onTestHeightChange(e.target.value)}
-            placeholder="167.7"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          )}
+          <div className="flex flex-col gap-1 min-w-0">
+            <Label htmlFor={`test-height${uniqueId}`} className="text-xs">Height (cm)</Label>
+            <Input
+              type="text"
+              inputMode="decimal"
+              id={`test-height${uniqueId}`}
+              value={testHeight || ''}
+              onChange={(e) => onTestHeightChange(e.target.value)}
+              placeholder="167.7"
+              className="w-full h-8 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          {onPretareChange && (
+          <div className="flex flex-col gap-1 min-w-0">
+            <Label htmlFor={`pretare${uniqueId}`} className="text-xs">Pre-tare (kg)</Label>
+            <Input
+              type="text"
+              inputMode="decimal"
+              id={`pretare${uniqueId}`}
+              value={pretare || ''}
+              onChange={(e) => onPretareChange(e.target.value)}
+              placeholder="0.00"
+              className="w-full h-8 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          )}
         </div>
       </div>
       

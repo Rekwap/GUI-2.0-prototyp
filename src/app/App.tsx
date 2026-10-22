@@ -29,7 +29,7 @@ import HeightCalibration from "./components/HeightCalibration";
 import Network from "./components/Network";
 import ServerConnection from "./components/ServerConnection";
 import { TactileHeightScreen } from "./flows/TactileHeight";
-import { DeviceModeScreen, StepOnScaleScreen } from "./flows/SelfMeasurement";
+import { DeviceModeScreen, SelfMeasurementFlow } from "./flows/SelfMeasurement";
 import HeightConfirmation from "./components/HeightConfirmation";
 import TactileHeightMeasurementComplete from "./components/TactileHeightMeasurementComplete";
 import ControlPanel from "./components/ControlPanel";
@@ -1617,7 +1617,12 @@ function AppContent() {
         >
           {deviceMode === 'choose'
             ? <DeviceModeScreen onGuided={() => setDeviceMode('guided')} onSelf={() => setDeviceMode('self')} />
-            : <StepOnScaleScreen />}
+            : <SelfMeasurementFlow
+                weightKg={parseFloat(testWeight) || 0}
+                heightCm={parseFloat(testHeight) || 0}
+                isMetric={isMetric}
+                formatImperialHeight={convertCmToFeetInches}
+              />}
         </div>
         {showControlPanel && (
           <ControlPanel 

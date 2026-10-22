@@ -30,6 +30,22 @@ import tactileMetric from './screens/11178-33011.json';
 import tactileImperial from './screens/11168-24415.json';
 import deviceMode from './screens/14010-59910.json';
 import stepOnScale from './screens/14010-59947.json';
+import smRemove from './screens/14010-59769.json';
+import smScan from './screens/14010-59785.json';
+import smWelcome from './screens/14010-59799.json';
+import smWeigh from './screens/14010-59840.json';
+import smWeighLocked from './screens/14010-59827.json';
+import smYourWeight from './screens/14010-59819.json';
+import smPostureBad from './screens/14010-59861.json';
+import smPostureOk from './screens/14010-59863.json';
+import smCountdown from './screens/14010-59866.json';
+import smHeightProgress from './screens/14010-59868.json';
+import smHeightDone from './screens/14010-59872.json';
+import smYourHeight from './screens/14010-59874.json';
+import smOverview from './screens/15626-53930.json';
+import smSending from './screens/14010-59882.json';
+import smOk from './screens/14010-59884.json';
+import smDataSaved from './screens/15587-50166.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -61,6 +77,22 @@ export const SCREENS = {
   tactileImperial: tactileImperial as unknown as FNode,
   deviceMode: deviceMode as unknown as FNode,
   stepOnScale: stepOnScale as unknown as FNode,
+  smRemove: smRemove as unknown as FNode,
+  smScan: smScan as unknown as FNode,
+  smWelcome: smWelcome as unknown as FNode,
+  smWeigh: smWeigh as unknown as FNode,
+  smWeighLocked: smWeighLocked as unknown as FNode,
+  smYourWeight: smYourWeight as unknown as FNode,
+  smPostureBad: smPostureBad as unknown as FNode,
+  smPostureOk: smPostureOk as unknown as FNode,
+  smCountdown: smCountdown as unknown as FNode,
+  smHeightProgress: smHeightProgress as unknown as FNode,
+  smHeightDone: smHeightDone as unknown as FNode,
+  smYourHeight: smYourHeight as unknown as FNode,
+  smOverview: smOverview as unknown as FNode,
+  smSending: smSending as unknown as FNode,
+  smOk: smOk as unknown as FNode,
+  smDataSaved: smDataSaved as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -92,5 +124,21 @@ export const FIGMA_IDS = {
   "tactileMetric": "11178:33011",
   "tactileImperial": "11168:24415",
   "deviceMode": "14010:59910",
-  "stepOnScale": "14010:59947"
+  "stepOnScale": "14010:59947",
+  "smRemove": "14010:59769",
+  "smScan": "14010:59785",
+  "smWelcome": "14010:59799",
+  "smWeigh": "14010:59840",
+  "smWeighLocked": "14010:59827",
+  "smYourWeight": "14010:59819",
+  "smPostureBad": "14010:59861",
+  "smPostureOk": "14010:59863",
+  "smCountdown": "14010:59866",
+  "smHeightProgress": "14010:59868",
+  "smHeightDone": "14010:59872",
+  "smYourHeight": "14010:59874",
+  "smOverview": "15626:53930",
+  "smSending": "14010:59882",
+  "smOk": "14010:59884",
+  "smDataSaved": "15587:50166"
 } as const;

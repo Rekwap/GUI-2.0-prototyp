@@ -44,6 +44,8 @@ export type ScreenOverrides = {
   hide?: string[];
   onClick?: Record<string, () => void>;
   replace?: Record<string, ReactNode>;
+  /** Override the solid fill of a box node. */
+  fill?: Record<string, string>;
 };
 
 const WEIGHT: Record<string, number> = {
@@ -158,7 +160,7 @@ function Node({ n, o, parentW = 272 }: { n: FNode; o: ScreenOverrides; parentW?:
       onClick={click}
       style={{
         position: 'absolute', left: n.x, top: n.y, width: n.w, height: n.h,
-        background: n.f, borderRadius: radius(n.r), boxShadow: boxShadow(n),
+        background: o.fill?.[n.i] ?? n.f, borderRadius: radius(n.r), boxShadow: boxShadow(n),
         overflow: n.clip ? 'hidden' : undefined, opacity: n.op, ...clickStyle,
       }}
     >

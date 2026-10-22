@@ -134,7 +134,7 @@ export function MenuFlow({ onClose, onRestart, controlPanel, onToggleControlPane
             fontFamily: "'Noto Sans Display', sans-serif", fontWeight: 500, fontSize: 16, color: '#8b8d91',
           }}
         >
-          [Control Panel: {controlPanel ? 'ein' : 'aus'}]
+          [Control Panel: {controlPanel ? 'on' : 'off'}]
         </button>
       )}
     </FigmaScreen>

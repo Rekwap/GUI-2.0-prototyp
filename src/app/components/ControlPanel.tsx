@@ -114,9 +114,9 @@ export default function ControlPanel({
         {/* Separator */}
         <div className="border-t" />
 
-        {/* Höhenmessung Modus Section */}
+        {/* Height measurement mode section */}
         <div className="flex flex-col gap-2">
-          <Label>Höhenmessung Modus</Label>
+          <Label>Height Measurement Mode</Label>
           <div className="flex flex-col gap-1">
             <div className="flex items-center space-x-2">
               <input 
@@ -127,7 +127,7 @@ export default function ControlPanel({
                 onChange={() => onHeightModeChange('ultrasonic')} 
                 disabled={ultrasonicOnly}
               />
-              <Label htmlFor={`height-ultrasonic${uniqueId}`}>Ultraschall</Label>
+              <Label htmlFor={`height-ultrasonic${uniqueId}`}>Ultrasonic</Label>
             </div>
             <div className="flex items-center space-x-2">
               <input 
@@ -138,7 +138,7 @@ export default function ControlPanel({
                 onChange={() => onHeightModeChange('manual')} 
                 disabled={ultrasonicOnly}
               />
-              <Label htmlFor={`height-manual${uniqueId}`} className={ultrasonicOnly ? 'opacity-40' : undefined}>Manuell</Label>
+              <Label htmlFor={`height-manual${uniqueId}`} className={ultrasonicOnly ? 'opacity-40' : undefined}>Manual</Label>
             </div>
             <div className="flex items-center space-x-2">
               <input 
@@ -149,7 +149,7 @@ export default function ControlPanel({
                 onChange={() => onHeightModeChange('tactile')} 
                 disabled={ultrasonicOnly}
               />
-              <Label htmlFor={`height-tactile${uniqueId}`} className={ultrasonicOnly ? 'opacity-40' : undefined}>Taktil</Label>
+              <Label htmlFor={`height-tactile${uniqueId}`} className={ultrasonicOnly ? 'opacity-40' : undefined}>Tactile</Label>
             </div>
           </div>
         </div>

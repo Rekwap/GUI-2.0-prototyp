@@ -884,6 +884,8 @@ function AppContent() {
   const [pretare, setPretare] = useState('');
   // Persistent (global) pre-tare: suspended once an assistant tare overrides it, back after stepping off.
   const [ptSuspended, setPtSuspended] = useState(false);
+  // After stepping off, the height area shows "Scale ready" until the next patient steps on.
+  const [steppedOff, setSteppedOff] = useState(false);
   
   // Previous value screen state
   const [showPreviousValue, setShowPreviousValue] = useState(false);
@@ -1017,9 +1019,15 @@ function AppContent() {
     setShowReweightButton(false);
     setIsReweighting(false);
     setPtSuspended(false);
+    // The next patient starts fresh: height/BMI are cleared too.
+    setHeightMeasured(false);
+    setHeightValue(null);
+    setShowBsa(false);
+    setSteppedOff(true);
   };
 
   const handleWeightClick = () => {
+    setSteppedOff(false);
     // If tared and showing 0.00, show baby weight (3.8 kg)
     if (taredWeight !== null && parseFloat(weight) === 0) {
       const babyWeight = 3.8;
@@ -1575,6 +1583,7 @@ function AppContent() {
     setTaredWeight(null);
     setPreTareValues([]);
     setPtSuspended(false);
+    setSteppedOff(false);
     setShowReweightButton(false);
     setIsPatientLoggedIn(false);
     setIsUserLoggedIn(false);
@@ -2692,7 +2701,9 @@ function AppContent() {
                     ? { kind: 'patient' }
                     : { kind: 'none' };
           const label = getDisplayLabel();
-          const height: HeightPanelProps = !heightMeasured
+          const height: HeightPanelProps = steppedOff && parseFloat(rawWeight) === 0
+            ? { state: 'stepOnScale' }
+            : !heightMeasured
             ? { state: 'start', onHeight: handleHeightClick }
             : isHeightUpdating
               ? {
@@ -2805,7 +2816,7 @@ function AppContent() {
             onPretareChange={setPretare}
           uniqueId="-main"
             printing={printing}
-          onStepOff={parseFloat(rawWeight) !== 0 || tareOverride ? handleStepOff : undefined}
+          onStepOff={parseFloat(rawWeight) !== 0 || tareOverride || heightMeasured ? handleStepOff : undefined}
           onScanBarcode={handleBarcodeScan}
           tareBarcode={tareBarcodeKg}
           onTareBarcodeChange={setTareBarcodeKg}

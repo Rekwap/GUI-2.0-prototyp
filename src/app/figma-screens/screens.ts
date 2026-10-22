@@ -115,6 +115,7 @@ import mServicePin from './screens/10024-18951.json';
 import mPretareKeypad from './screens/13061-26953.json';
 import mPretareSet from './screens/13061-27010.json';
 import deviceModePt from './screens/14010-59908.json';
+import woYourWeightPt from './screens/14010-59822.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -231,6 +232,7 @@ export const SCREENS = {
   mPretareKeypad: mPretareKeypad as unknown as FNode,
   mPretareSet: mPretareSet as unknown as FNode,
   deviceModePt: deviceModePt as unknown as FNode,
+  woYourWeightPt: woYourWeightPt as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -347,5 +349,6 @@ export const FIGMA_IDS = {
   "mServicePin": "10024:18951",
   "mPretareKeypad": "13061:26953",
   "mPretareSet": "13061:27010",
-  "deviceModePt": "14010:59908"
+  "deviceModePt": "14010:59908",
+  "woYourWeightPt": "14010:59822"
 } as const;

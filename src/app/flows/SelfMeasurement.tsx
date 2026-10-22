@@ -190,9 +190,13 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
 
     case 'yourWeight': {
       if (!heightRequired) {
-        const p = 'I14529:37769;14217:74274;';
+        // With persistent pre-tare: variant with "Net" and the "Pre-tare" row (Figma 14010:59822).
+        const p = pt ? 'I14010:59823;14217:74274;' : 'I14529:37769;14217:74274;';
         return (
-          <FigmaScreen data={SCREENS.woYourWeight} text={{ [p + '13202:63011']: w(weightKg), [p + '13202:63009']: wUnit }}>
+          <FigmaScreen
+            data={pt ? SCREENS.woYourWeightPt : SCREENS.woYourWeight}
+            text={{ [p + '13202:63011']: w(weightKg), [p + '13202:63009']: wUnit, 'I14010:59823;13854:39537': ptText }}
+          >
             <RepeatNext onRepeat={go('weigh')} onNext={go(integrated ? 'woSending' : print ? 'spNoteWo' : 'saNoteWo')} />
           </FigmaScreen>
         );

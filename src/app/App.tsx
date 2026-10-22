@@ -877,6 +877,8 @@ function AppContent() {
   // Control Panel visibility (visible by default)
   const [showControlPanel, setShowControlPanel] = useState(true);
   const [pretare, setPretare] = useState('');
+  // Persistent (global) pre-tare: suspended once an assistant tare overrides it, back after stepping off.
+  const [ptSuspended, setPtSuspended] = useState(false);
   
   // Previous value screen state
   const [showPreviousValue, setShowPreviousValue] = useState(false);
@@ -975,6 +977,24 @@ function AppContent() {
 
   const bsaValue = calculateBsaOrBmi(selectedMode);
 
+  const persistentKg = Math.max(0, parseFloat(pretare) || 0);
+  const tareOverride = taredWeight !== null || preTareValues.length > 0 || motherMode;
+  const ptActive = persistentKg > 0 && !tareOverride && !ptSuspended;
+  const tareKgNow = () =>
+    preTareValues.reduce((sum, v) => sum + parseFloat(v), 0) + (taredWeight ? parseFloat(taredWeight) : 0) + (ptActive ? persistentKg : 0);
+
+  // Step off: assistant tares end, the persistent pre-tare applies again.
+  const handleStepOff = () => {
+    setRawWeight('0.00');
+    setWeight('0.00');
+    setTaredWeight(null);
+    setPreTareValues([]);
+    setMotherMode(false);
+    setShowReweightButton(false);
+    setIsReweighting(false);
+    setPtSuspended(false);
+  };
+
   const handleWeightClick = () => {
     // If tared and showing 0.00, show baby weight (3.8 kg)
     if (taredWeight !== null && parseFloat(weight) === 0) {
@@ -999,9 +1019,8 @@ function AppContent() {
     setHasEverMeasured(true);
     // Add the test weight (Control Panel) to the current displayed weight
     const kg = parseFloat(testWeight) || 0;
-    const currentWeight = parseFloat(weight);
-    const newWeight = currentWeight + (isMetric ? kg : kgToLbs(kg));
-    setWeight(newWeight.toFixed(2));
+    const net = kg - tareKgNow();
+    setWeight((isMetric ? net : kgToLbs(net)).toFixed(2));
     setRawWeight(kg.toFixed(2));
   };
 
@@ -1010,8 +1029,7 @@ function AppContent() {
     setTestWeight(value);
     const kg = parseFloat(value);
     if (isNaN(kg) || parseFloat(rawWeight) === 0 || taredWeight !== null) return;
-    const totalPreTare = preTareValues.reduce((sum, v) => sum + parseFloat(v), 0);
-    const net = kg - totalPreTare;
+    const net = kg - tareKgNow();
     setRawWeight(kg.toFixed(2));
     setWeight((isMetric ? net : kgToLbs(net)).toFixed(2));
   };
@@ -1024,9 +1042,7 @@ function AppContent() {
     // Don't reset rawWeight - keep the measured value
     setTimeout(() => {
       // Calculate tare if active
-      const totalPreTare = preTareValues.reduce((sum, value) => sum + parseFloat(value), 0);
-      const manualTare = taredWeight ? parseFloat(taredWeight) : 0;
-      const totalTare = totalPreTare + manualTare;
+      const totalTare = tareKgNow();
       
       // Calculate net weight (subtract tare from measured weight)
       const netWeight = measuredWeight - totalTare;
@@ -1210,12 +1226,14 @@ function AppContent() {
     // The measured weight stays in rawWeight, but displayed weight becomes 0.00
     // This preserves the measurement for the tare badge
     setTaredWeight(rawWeight); // Set taredWeight so Tare info shows in Main Screen
+    setPtSuspended(true); // "Set to zero" overrides the persistent pre-tare
     setWeight('0.00');
     // Don't reset rawWeight - keep it to show tare badge
   };
 
   const handlePreTareConfirm = (values: string[]) => {
     setPreTareValues(values);
+    setPtSuspended(true);
     setShowTareAssistant(false);
     
     // Recalculate displayed weight
@@ -1242,6 +1260,7 @@ function AppContent() {
 
   const handleManualTareConfirm = (value: string) => {
     setTaredWeight(value);
+    setPtSuspended(true);
     setShowManualTare(false);
     setShowTareAssistant(false);
     
@@ -1350,7 +1369,7 @@ function AppContent() {
   const handleOverviewSend = () => {
     setShowOverview(false);
     // Remember the sent values for RECALL
-    const tareKg = preTareValues.reduce((sum, v) => sum + parseFloat(v), 0) + (taredWeight ? parseFloat(taredWeight) : 0);
+    const tareKg = tareKgNow();
     setLastSent({ weightKg: parseFloat(rawWeight) - tareKg, tareKg, time: Date.now() });
     // Transmitting data ... → Data saved → main screen
     setShowTransmitting(true);
@@ -1531,6 +1550,7 @@ function AppContent() {
     setShowBsa(false);
     setTaredWeight(null);
     setPreTareValues([]);
+    setPtSuspended(false);
     setShowReweightButton(false);
     setIsPatientLoggedIn(false);
     setIsUserLoggedIn(false);
@@ -1631,7 +1651,8 @@ function AppContent() {
           {deviceMode === 'choose'
             ? <DeviceModeScreen onGuided={() => setDeviceMode('guided')} onSelf={() => setDeviceMode('self')} />
             : <SelfMeasurementFlow
-                weightKg={parseFloat(testWeight) || 0}
+                weightKg={(parseFloat(testWeight) || 0) - persistentKg}
+                pretareKg={persistentKg}
                 heightCm={parseFloat(testHeight) || 0}
                 isMetric={isMetric}
                 heightRequired={heightRequired}
@@ -2054,6 +2075,7 @@ function AppContent() {
               setRawWeight((adultKg + childKg).toFixed(2));
               setWeight((isMetric ? childKg : kgToLbs(childKg)).toFixed(2));
               setMotherMode(true);
+              setPtSuspended(true);
               setShowReweightButton(true);
               setHasEverMeasured(true);
               setShowTareAssistant(false);
@@ -2061,12 +2083,14 @@ function AppContent() {
             onClothing={(valueKg) => {
               const values = valueKg > 0 ? [valueKg.toFixed(2)] : [];
               setPreTareValues(values);
+              setPtSuspended(true);
               const manualTare = taredWeight ? parseFloat(taredWeight) : 0;
               const net = parseFloat(rawWeight) - valueKg - manualTare;
               setWeight((isMetric ? net : kgToLbs(net)).toFixed(2));
               setShowTareAssistant(false);
             }}
             initialClothingKg={preTareValues.reduce((sum, v) => sum + parseFloat(v), 0)}
+            minClothingKg={persistentKg}
           />
         </div>
         {showControlPanel && (
@@ -2628,7 +2652,10 @@ function AppContent() {
       >
         {(() => {
           // GUI 2.1 main screen (1:1 with Figma handover, see ./main-screen)
-          const totalTare = preTareValues.reduce((sum, v) => sum + parseFloat(v), 0) + (taredWeight ? parseFloat(taredWeight) : 0);
+          const totalTare = tareKgNow();
+          // Empty scale with persistent pre-tare: the reading shows the deduction as a negative net value.
+          const emptyPt = ptActive && parseFloat(rawWeight) === 0;
+          const ptOnly = ptActive && totalTare === persistentKg;
           const tareText = totalTare === 0 ? null : `-${isMetric ? totalTare.toFixed(2) : kgToLbs(totalTare).toFixed(1)} ${isMetric ? 'kg' : 'lbs'}`;
           const login: LoginBanner =
             loginMode === 'both' && (isUserLoggedIn || isPatientLoggedIn)
@@ -2662,10 +2689,10 @@ function AppContent() {
               statusBar={{ login, onMenu: handleMenuClick, onLogout: handleLogout, printer: installationMode === 'simpleprint' }}
               weight={{
                 state: 'value',
-                value: parseFloat(formatWeight(weight)).toFixed(2),
+                value: emptyPt ? (-(isMetric ? persistentKg : kgToLbs(persistentKg))).toFixed(2) : parseFloat(formatWeight(weight)).toFixed(2),
                 unit: isMetric ? 'kg' : 'lbs',
                 rangeText: isMetric ? 'Max 360 kg' : 'Max 790 lbs',
-                showNet: taredWeight !== null || preTareValues.length > 0,
+                showNet: taredWeight !== null || preTareValues.length > 0 || ptActive,
                 locked: parseFloat(rawWeight) !== 0 && !isReweighting,
                 showBaby: motherMode,
                 onValueClick: handleWeightClick,
@@ -2677,6 +2704,8 @@ function AppContent() {
                 reweightDisabled: isReweighting,
                 onReweight: handleReweight,
                 onRemoveTare: handleRemoveTare,
+                // Persistent pre-tare alone cannot be removed here (no ×).
+                hideRemove: ptOnly,
               }}
               height={height}
               buttons={{ onTare: handleTareClick, onRecall: handleRecallClick, onConfirm: handleSendClick, standalone: installationMode !== 'integrated', print: installationMode === 'simpleprint' }}
@@ -2688,7 +2717,7 @@ function AppContent() {
         {showPreviousValue && (
           <div className="absolute inset-0 z-50">
             {(() => {
-              const tareNow = preTareValues.reduce((sum, v) => sum + parseFloat(v), 0) + (taredWeight ? parseFloat(taredWeight) : 0);
+              const tareNow = tareKgNow();
               const rec = lastSent ?? { weightKg: parseFloat(rawWeight) - tareNow, tareKg: tareNow, time: Date.now() };
               return (
                 <RecallScreen
@@ -2739,6 +2768,7 @@ function AppContent() {
             onPretareChange={setPretare}
           uniqueId="-main"
             printing={printing}
+          onStepOff={parseFloat(rawWeight) !== 0 || tareOverride ? handleStepOff : undefined}
           onScanBarcode={handleBarcodeScan}
           onReset={handleReset}
           zoomLevel={zoomLevel}

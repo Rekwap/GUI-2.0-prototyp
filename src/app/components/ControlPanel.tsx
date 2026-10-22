@@ -21,6 +21,8 @@ interface ControlPanelProps {
   /** Global pre-tare (kg), applied before every measurement. Empty = off. */
   pretare?: string;
   onPretareChange?: (kg: string) => void;
+  /** Simulate the patient stepping off the scale (ends assistant tares). */
+  onStepOff?: () => void;
   uniqueId?: string;
   onReset?: () => void;
   zoomLevel?: number;
@@ -67,6 +69,7 @@ export default function ControlPanel({
   onTestWeightChange,
   pretare,
   onPretareChange,
+  onStepOff,
   uniqueId = '',
   onReset,
   zoomLevel = 100,
@@ -247,6 +250,15 @@ export default function ControlPanel({
           </div>
           )}
         </div>
+        {onStepOff && (
+          <button
+            type="button"
+            onClick={onStepOff}
+            className="-mt-2 self-start text-xs text-gray-700 underline underline-offset-2 hover:text-black cursor-pointer"
+          >
+            Step off scale
+          </button>
+        )}
       </div>
       
       {/* Reset Button */}

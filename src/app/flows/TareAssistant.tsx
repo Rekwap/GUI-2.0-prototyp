@@ -23,12 +23,18 @@ export type TareAssistantProps = {
   /** Clothing/Accessories confirmed with a pre-tare value (kg). */
   onClothing: (valueKg: number) => void;
   initialClothingKg?: number;
+  /** Persistent pre-tare (kg): preselected and the lower limit of the clothing value. */
+  minClothingKg?: number;
 };
 
-export function TareAssistant({ isMetric, onBack, onTare, onMotherChild, onClothing, initialClothingKg = 0 }: TareAssistantProps) {
+export function TareAssistant({ isMetric, onBack, onTare, onMotherChild, onClothing, initialClothingKg = 0, minClothingKg = 0 }: TareAssistantProps) {
   const [step, setStep] = useState<Step>('menu');
   // Clothing value is kept in display units (kg: 0.5 steps, lbs: 1.0 steps).
-  const [clothing, setClothing] = useState(() => (isMetric ? initialClothingKg : Math.round(initialClothingKg * KG_TO_LBS)));
+  const [clothing, setClothing] = useState(() => {
+    const kg = Math.max(initialClothingKg, minClothingKg);
+    return isMetric ? kg : Math.round(kg * KG_TO_LBS);
+  });
+  const minClothing = isMetric ? minClothingKg : Math.round(minClothingKg * KG_TO_LBS);
 
   // Adult weight settles, then the scale tares automatically.
   useEffect(() => {
@@ -128,8 +134,8 @@ export function TareAssistant({ isMetric, onBack, onTare, onMotherChild, onCloth
       );
     }
     case 'clothing': {
-      const zero = clothing <= 0;
-      // Exports: minus disabled at 0 (…0) vs. enabled; kg vs. lbs step label.
+      const zero = clothing <= minClothing;
+      // Exports: minus disabled at 0 / at the persistent pre-tare (…0) vs. enabled; kg vs. lbs step label.
       const key = isMetric ? (zero ? 'clothingKg0' : 'clothingKg') : zero ? 'clothingLbs0' : 'clothingLbs';
       const p = { clothingKg0: 'I12806:29684;', clothingKg: 'I12806:30028;', clothingLbs0: 'I12806:29821;', clothingLbs: 'I12806:29948;' }[key];
       const step = isMetric ? 0.5 : 1;
@@ -142,7 +148,7 @@ export function TareAssistant({ isMetric, onBack, onTare, onMotherChild, onCloth
             [p + '12065:21481']: () => onClothing(isMetric ? clothing : clothing / KG_TO_LBS),
           }}
         >
-          <HitArea x={66} y={320} w={50} h={50} label="Minus" onClick={() => setClothing(v => Math.max(0, +(v - step).toFixed(1)))} />
+          <HitArea x={66} y={320} w={50} h={50} label="Minus" onClick={() => setClothing(v => Math.max(minClothing, +(v - step).toFixed(1)))} />
           <HitArea x={156} y={320} w={50} h={50} label="Plus" onClick={() => setClothing(v => +(v + step).toFixed(1))} />
         </FigmaScreen>
       );

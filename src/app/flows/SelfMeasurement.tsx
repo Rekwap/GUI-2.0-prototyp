@@ -71,6 +71,8 @@ export type SelfMeasurementProps = {
   /** Simple print: printout is triggered automatically with the result screen. */
   onPrint?: () => void;
   formatImperialHeight: (cm: string) => string;
+  /** Persistent pre-tare (kg); weightKg is already net. 0 = off (no "Pre-tare" row, no "Net"). */
+  pretareKg?: number;
 };
 
 /** Two buttons of "button-self_272x72" (repeat | next) are one SVG: hit areas. */
@@ -83,7 +85,7 @@ function RepeatNext({ onRepeat, onNext }: { onRepeat: () => void; onNext: () => 
   );
 }
 
-export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequired, installation, onPrint, formatImperialHeight }: SelfMeasurementProps) {
+export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequired, installation, onPrint, formatImperialHeight, pretareKg = 0 }: SelfMeasurementProps) {
   const integrated = installation === 'integrated';
   const print = installation === 'simpleprint';
   const [step, setStep] = useState<Step>('start');
@@ -111,11 +113,11 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
     const dur = 1400;
     const tick = (t: number) => {
       const k = Math.min(1, (t - t0) / dur);
-      setShownKg(weightKg * (1 - Math.pow(1 - k, 3)));
+      setShownKg(-pretareKg + (weightKg + pretareKg) * (1 - Math.pow(1 - k, 3)));
       if (k < 1) raf.current = requestAnimationFrame(tick);
       else { raf.current = null; setStep('weighLocked'); }
     };
-    setShownKg(0);
+    setShownKg(-pretareKg);
     raf.current = requestAnimationFrame(tick);
     return () => { if (raf.current) cancelAnimationFrame(raf.current); };
   }, [step, weightKg]);
@@ -133,6 +135,8 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
   const h = isMetric ? heightCm.toFixed(1) : formatImperialHeight(heightCm.toFixed(1));
   const hUnit = isMetric ? 'cm' : 'ft\'in"';
   const go = (s: Step) => () => setStep(s);
+  const pt = pretareKg > 0;
+  const ptText = `${w(pretareKg)} ${wUnit}`;
   const startCountdown = () => { setCount(3); setStep('countdown'); };
 
   switch (step) {
@@ -166,9 +170,10 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
           text={{
             [p + '13152:46913;13202:63216;13202:63011']: w(locked ? weightKg : shownKg),
             [p + '13152:46913;13202:63216;13202:63009']: wUnit,
+            [p + '13854:39522']: ptText,
           }}
           // No persistent pre-tare: no "Pre-tare" row, no "Net".
-          hide={[p + '14138:35745', p + '13854:39522', p + '13152:46913;14131:37789']}
+          hide={pt ? [] : [p + '14138:35745', p + '13854:39522', p + '13152:46913;14131:37789']}
         />
       );
     }
@@ -186,8 +191,8 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
       return (
         <FigmaScreen
           data={SCREENS.smYourWeight}
-          text={{ [p + '14217:74274;13202:63011']: w(weightKg), [p + '14217:74274;13202:63009']: wUnit }}
-          hide={[p + '13854:39536', p + '13854:39537', p + '14161:36762']}
+          text={{ [p + '14217:74274;13202:63011']: w(weightKg), [p + '14217:74274;13202:63009']: wUnit, [p + '13854:39537']: ptText }}
+          hide={pt ? [] : [p + '13854:39536', p + '13854:39537', p + '14161:36762']}
         >
           <RepeatNext onRepeat={go('weigh')} onNext={go('postureBad')} />
         </FigmaScreen>

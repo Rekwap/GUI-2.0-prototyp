@@ -884,6 +884,8 @@ function AppContent() {
   const [pretare, setPretare] = useState('');
   // Persistent (global) pre-tare: suspended once an assistant tare overrides it, back after stepping off.
   const [ptSuspended, setPtSuspended] = useState(false);
+  // Temp. pre-tare from Tare-by-Scanning (scans add up).
+  const [scanKg, setScanKg] = useState(0);
   // After stepping off, the height area shows "Scale ready" until the next patient steps on.
   const [steppedOff, setSteppedOff] = useState(false);
   
@@ -984,30 +986,45 @@ function AppContent() {
 
   const bsaValue = calculateBsaOrBmi(selectedMode);
 
+  /*
+   * Tare model (seca spec "Persistent Pre-Tare / Global Deduction"):
+   *   Persistent pre-tare (PT) + temp. pre-tare (scans + clothing) + tare (set to zero / mother & child).
+   *   Scan: PT on, adds to temp.      Tare / Mother&Child: PT off, temp cleared, new tare.
+   *   Main screen X: PT on, temp and tare cleared.      Clothing: PT off, replaces the clothing part of temp.
+   *   Clear values (step off): PT on, temp and tare cleared.      PT setting change: PT on, temp cleared.
+   */
   const persistentKg = Math.max(0, parseFloat(pretare) || 0);
-  const tareOverride = taredWeight !== null || preTareValues.length > 0 || motherMode;
-  const ptActive = persistentKg > 0 && !tareOverride && !ptSuspended;
-  const tareKgNow = () =>
-    preTareValues.reduce((sum, v) => sum + parseFloat(v), 0) + (taredWeight ? parseFloat(taredWeight) : 0) + (ptActive ? persistentKg : 0);
+  const ptActive = persistentKg > 0 && !ptSuspended;
+  const clothingKg = preTareValues.reduce((sum, v) => sum + parseFloat(v), 0);
+  const tareOverride = taredWeight !== null || preTareValues.length > 0 || motherMode || scanKg > 0;
+  const tareKgNow = () => clothingKg + scanKg + (taredWeight ? parseFloat(taredWeight) : 0) + (ptActive ? persistentKg : 0);
+  /** Net weight (kg) for a given tare composition, applied to the reading if someone is on the scale. */
+  const applyNet = (tareKg: number) => {
+    const raw = parseFloat(rawWeight);
+    setWeight((raw === 0 ? -tareKg : raw - tareKg).toFixed(2));
+  };
 
   useEffect(() => {
     if (tareScan === null) return;
     const t = setTimeout(() => {
       const kg = tareScan;
       setTareScan(null);
-      setPreTareValues([kg.toFixed(2)]);
-      setTaredWeight(null);
-      setMotherMode(false);
-      setPtSuspended(true);
-      if (parseFloat(rawWeight) !== 0) {
-        const net = parseFloat(rawWeight) - kg;
-        setWeight(net.toFixed(2));
-      } else {
-        setWeight((-kg).toFixed(2));
-      }
+      const nextScan = scanKg + kg;
+      setScanKg(nextScan);
+      setPtSuspended(false);
+      applyNet(clothingKg + nextScan + (taredWeight ? parseFloat(taredWeight) : 0) + persistentKg);
     }, 3000);
     return () => clearTimeout(t);
   }, [tareScan]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handlePretareChange = (kg: string) => {
+    setPretare(kg);
+    setPtSuspended(false);
+    setScanKg(0);
+    setPreTareValues([]);
+    const pt = Math.max(0, parseFloat(kg) || 0);
+    if (parseFloat(rawWeight) !== 0 && !motherMode) applyNet(pt + (taredWeight ? parseFloat(taredWeight) : 0));
+  };
 
   // Step off: assistant tares end, the persistent pre-tare applies again.
   const handleStepOff = () => {
@@ -1015,6 +1032,7 @@ function AppContent() {
     setWeight('0.00');
     setTaredWeight(null);
     setPreTareValues([]);
+    setScanKg(0);
     setMotherMode(false);
     setShowReweightButton(false);
     setIsReweighting(false);
@@ -1258,7 +1276,9 @@ function AppContent() {
     // The measured weight stays in rawWeight, but displayed weight becomes 0.00
     // This preserves the measurement for the tare badge
     setTaredWeight(rawWeight); // Set taredWeight so Tare info shows in Main Screen
-    setPtSuspended(true); // "Set to zero" overrides the persistent pre-tare
+    setPtSuspended(true); // "Set to zero": PT off, temp cleared, new tare
+    setScanKg(0);
+    setPreTareValues([]);
     setWeight('0.00');
     // Don't reset rawWeight - keep it to show tare badge
   };
@@ -1308,14 +1328,14 @@ function AppContent() {
     setWeight(displayWeight.toFixed(2));
   };
 
+  // Main screen ×: temp and tare cleared, the persistent pre-tare applies again immediately.
   const handleRemoveTare = () => {
     setTaredWeight(null);
     setPreTareValues([]);
+    setScanKg(0);
     setMotherMode(false);
-    
-    // Reset weight to raw weight
-    const displayWeight = parseFloat(rawWeight); // weight state is always kg
-    setWeight(displayWeight.toFixed(2));
+    setPtSuspended(false);
+    applyNet(persistentKg);
   };
 
   const handleSendClick = () => {
@@ -1582,6 +1602,7 @@ function AppContent() {
     setShowBsa(false);
     setTaredWeight(null);
     setPreTareValues([]);
+    setScanKg(0);
     setPtSuspended(false);
     setSteppedOff(false);
     setShowReweightButton(false);
@@ -1709,7 +1730,7 @@ function AppContent() {
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             uniqueId="-device"
@@ -1754,7 +1775,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-menu"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1798,7 +1819,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-calibration"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1839,7 +1860,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-integration"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1885,7 +1906,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-network"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1933,7 +1954,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-server"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -1982,7 +2003,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-tactile"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2028,7 +2049,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-tactile-complete"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2075,7 +2096,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-confirmation"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2105,6 +2126,7 @@ function AppContent() {
               // Adult weight becomes the tare, child stays on the scale (net = child)
               setTaredWeight(adultKg.toFixed(2));
               setPreTareValues([]);
+              setScanKg(0);
               setRawWeight((adultKg + childKg).toFixed(2));
               setWeight(childKg.toFixed(2));
               setMotherMode(true);
@@ -2114,12 +2136,11 @@ function AppContent() {
               setShowTareAssistant(false);
             }}
             onClothing={(valueKg) => {
+              // Clothing replaces the previous clothing value; scanned tares stay; PT off.
               const values = valueKg > 0 ? [valueKg.toFixed(2)] : [];
               setPreTareValues(values);
               setPtSuspended(true);
-              const manualTare = taredWeight ? parseFloat(taredWeight) : 0;
-              const net = parseFloat(rawWeight) - valueKg - manualTare;
-              setWeight(net.toFixed(2));
+              applyNet(valueKg + scanKg + (taredWeight ? parseFloat(taredWeight) : 0));
               setShowTareAssistant(false);
             }}
             initialClothingKg={preTareValues.reduce((sum, v) => sum + parseFloat(v), 0)}
@@ -2143,7 +2164,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-tare"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2189,7 +2210,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-manual-tare"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2236,7 +2257,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-manual-height"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2280,7 +2301,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-height-required"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2319,7 +2340,7 @@ function AppContent() {
             testHeight={testHeight}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             uniqueId="-integration"
@@ -2362,7 +2383,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-direct-login"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2403,7 +2424,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-scan-patient"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2444,7 +2465,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-patient-id"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2485,7 +2506,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-scan-user"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2526,7 +2547,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-user-id"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2572,7 +2593,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-both-ids"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2621,7 +2642,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-overview"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2662,7 +2683,7 @@ function AppContent() {
             onTestWeightChange={handleTestWeightChange}
             onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
             uniqueId="-data-saved"
             onReset={handleReset}
             zoomLevel={zoomLevel}
@@ -2687,7 +2708,7 @@ function AppContent() {
           // GUI 2.1 main screen (1:1 with Figma handover, see ./main-screen)
           const totalTare = tareKgNow();
           // Empty scale with persistent pre-tare: the reading shows the deduction as a negative net value.
-          const emptyPt = ptActive && parseFloat(rawWeight) === 0;
+          const emptyPt = parseFloat(rawWeight) === 0 && !motherMode && totalTare > 0;
           const ptOnly = ptActive && totalTare === persistentKg;
           const tareText = totalTare === 0 ? null : `-${isMetric ? totalTare.toFixed(2) : kgToLbs(totalTare).toFixed(2)} ${isMetric ? 'kg' : 'lbs'}`;
           const login: LoginBanner =
@@ -2725,10 +2746,10 @@ function AppContent() {
               statusBar={{ login, onMenu: handleMenuClick, onLogout: handleLogout, printer: installationMode === 'simpleprint' }}
               weight={{
                 state: 'value',
-                value: emptyPt ? (-(isMetric ? persistentKg : kgToLbs(persistentKg))).toFixed(2) : parseFloat(formatWeight(weight)).toFixed(2),
+                value: emptyPt ? (-(isMetric ? totalTare : kgToLbs(totalTare))).toFixed(2) : parseFloat(formatWeight(weight)).toFixed(2),
                 unit: isMetric ? 'kg' : 'lbs',
                 rangeText: isMetric ? 'Max 360 kg' : 'Max 790 lbs',
-                showNet: taredWeight !== null || preTareValues.length > 0 || ptActive,
+                showNet: totalTare > 0 || taredWeight !== null,
                 locked: parseFloat(rawWeight) !== 0 && !isReweighting,
                 showBaby: motherMode,
                 onValueClick: handleWeightClick,
@@ -2814,7 +2835,7 @@ function AppContent() {
           onTestWeightChange={handleTestWeightChange}
           onTestHeightChange={setTestHeight}
             pretare={pretare}
-            onPretareChange={setPretare}
+            onPretareChange={handlePretareChange}
           uniqueId="-main"
             printing={printing}
           onStepOff={parseFloat(rawWeight) !== 0 || tareOverride || heightMeasured ? handleStepOff : undefined}

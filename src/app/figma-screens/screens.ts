@@ -26,6 +26,8 @@ import userId from './screens/10657-12140.json';
 import transmitting from './screens/10686-27528.json';
 import dataSaved from './screens/10628-11469.json';
 import integration from './screens/11178-31354.json';
+import tactileMetric from './screens/11178-33011.json';
+import tactileImperial from './screens/11168-24415.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -53,6 +55,8 @@ export const SCREENS = {
   transmitting: transmitting as unknown as FNode,
   dataSaved: dataSaved as unknown as FNode,
   integration: integration as unknown as FNode,
+  tactileMetric: tactileMetric as unknown as FNode,
+  tactileImperial: tactileImperial as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -80,5 +84,7 @@ export const FIGMA_IDS = {
   "userId": "10657:12140",
   "transmitting": "10686:27528",
   "dataSaved": "10628:11469",
-  "integration": "11178:31354"
+  "integration": "11178:31354",
+  "tactileMetric": "11178:33011",
+  "tactileImperial": "11168:24415"
 } as const;

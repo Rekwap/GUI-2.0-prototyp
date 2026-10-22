@@ -28,7 +28,7 @@ import StatusBarPortraitBoth from "./imports/StatusBarPortraitBoth";
 import HeightCalibration from "./components/HeightCalibration";
 import Network from "./components/Network";
 import ServerConnection from "./components/ServerConnection";
-import TactileHeight from "./components/TactileHeight";
+import { TactileHeightScreen } from "./flows/TactileHeight";
 import HeightConfirmation from "./components/HeightConfirmation";
 import TactileHeightMeasurementComplete from "./components/TactileHeightMeasurementComplete";
 import ControlPanel from "./components/ControlPanel";
@@ -1146,11 +1146,12 @@ function AppContent() {
     setShowTactileComplete(true);
   };
 
-  const handleTactileHeightComplete = () => {
-    // Animation screen confirmed - save height and return to main
-    const height = testHeight; // Use the target height from control panel
+  const handleTactileHeightComplete = (measured?: string) => {
+    // Height confirmed - save the value shown by the head slide and return to main
+    const height = measured ?? testHeight;
     setHeightValue(height);
     setHeightMeasured(true);
+    setShowTactileHeight(false);
     setShowTactileComplete(false);
     
     // If we were triggered from Send button, check if we should show overview
@@ -1917,11 +1918,14 @@ function AppContent() {
             transformOrigin: 'center center'
           }}
         >
-          <TactileHeight 
-            onBack={handleTactileHeightCancel}
-            onMeasured={handleTactileHeightMeasured}
-            targetHeight={testHeight}
+          <TactileHeightScreen 
             isMetric={isMetric}
+            targetCm={parseFloat(testHeight) || 0}
+            initialCm={heightMeasured && heightValue ? parseFloat(heightValue) : undefined}
+            formatImperial={convertCmToFeetInches}
+            onBack={handleTactileHeightCancel}
+            onConfirm={handleTactileHeightComplete}
+            onKids={() => { setShowTactileHeight(false); setShowManualInput(true); }}
           />
         </div>
         {showControlPanel && (

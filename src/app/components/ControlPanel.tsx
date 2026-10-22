@@ -1,6 +1,7 @@
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
+import { BUILD_STAMP } from "../version";
 import { Slider } from "./ui/slider";
 
 interface ControlPanelProps {
@@ -81,7 +82,10 @@ export default function ControlPanel({
   return (
     <div className="flex flex-col h-[480px] w-[320px] p-6 bg-[rgb(233,233,233)] rounded-lg shadow-md flex-shrink-0 overflow-auto">
       <div className="flex flex-col gap-4">
-        <p className="text-[#d4183d] font-extrabold uppercase tracking-wide text-lg leading-tight">Only for internal use</p>
+        <div className="flex flex-col gap-0.5">
+          <p className="text-[#d4183d] font-extrabold uppercase tracking-wide text-lg leading-tight">Only for internal use</p>
+          <p className="text-xs text-gray-600">GUI 2.1 Prototype · {BUILD_STAMP}</p>
+        </div>
 
         {/* Switches Section */}
         <div className="flex flex-col gap-2">

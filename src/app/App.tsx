@@ -2701,7 +2701,8 @@ function AppContent() {
                     ? { kind: 'patient' }
                     : { kind: 'none' };
           const label = getDisplayLabel();
-          const height: HeightPanelProps = steppedOff && parseFloat(rawWeight) === 0
+          // Empty scale: no height measurement possible, the height area shows "Scale ready".
+          const height: HeightPanelProps = parseFloat(rawWeight) === 0 && !heightMeasured && !isHeightUpdating
             ? { state: 'stepOnScale' }
             : !heightMeasured
             ? { state: 'start', onHeight: handleHeightClick }

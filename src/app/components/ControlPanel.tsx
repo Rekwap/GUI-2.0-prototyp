@@ -67,7 +67,7 @@ export default function ControlPanel({
   return (
     <div className="flex flex-col h-[480px] w-[320px] p-6 bg-[rgb(233,233,233)] rounded-lg shadow-md flex-shrink-0 overflow-auto">
       <div className="flex flex-col gap-4">
-        <p className="text-[#d4183d] font-semibold uppercase tracking-wide text-sm">Only for internal use</p>
+        <p className="text-[#d4183d] font-extrabold uppercase tracking-wide text-lg leading-tight">Only for internal use</p>
 
         {/* Switches Section */}
         <div className="flex flex-col gap-2">

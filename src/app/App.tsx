@@ -1641,6 +1641,7 @@ function AppContent() {
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
             uniqueId="-device"
+            ultrasonicOnly={deviceMode === 'self'}
             onReset={handleReset}
             zoomLevel={zoomLevel}
             onZoomLevelChange={setZoomLevel}

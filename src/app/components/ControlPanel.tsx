@@ -24,6 +24,8 @@ interface ControlPanelProps {
   onZoomLevelChange?: (zoom: number) => void;
   /** Simulate a barcode scan (direct login without the send wizard). */
   onScanBarcode?: (kind: 'patient' | 'user') => void;
+  /** Self-measurement: only ultrasonic height measurement is available. */
+  ultrasonicOnly?: boolean;
 }
 
 function ScanButton({ label, onClick }: { label: string; onClick: () => void }) {
@@ -62,7 +64,8 @@ export default function ControlPanel({
   onReset,
   zoomLevel = 100,
   onZoomLevelChange,
-  onScanBarcode
+  onScanBarcode,
+  ultrasonicOnly = false
 }: ControlPanelProps) {
   return (
     <div className="flex flex-col h-[480px] w-[320px] p-6 bg-[rgb(233,233,233)] rounded-lg shadow-md flex-shrink-0 overflow-auto">
@@ -97,8 +100,9 @@ export default function ControlPanel({
                 type="radio" 
                 id={`height-ultrasonic${uniqueId}`}
                 name={`height-mode${uniqueId}`}
-                checked={heightMode === 'ultrasonic'} 
+                checked={ultrasonicOnly || heightMode === 'ultrasonic'} 
                 onChange={() => onHeightModeChange('ultrasonic')} 
+                disabled={ultrasonicOnly}
               />
               <Label htmlFor={`height-ultrasonic${uniqueId}`}>Ultraschall</Label>
             </div>
@@ -107,20 +111,22 @@ export default function ControlPanel({
                 type="radio" 
                 id={`height-manual${uniqueId}`}
                 name={`height-mode${uniqueId}`}
-                checked={heightMode === 'manual'} 
+                checked={!ultrasonicOnly && heightMode === 'manual'} 
                 onChange={() => onHeightModeChange('manual')} 
+                disabled={ultrasonicOnly}
               />
-              <Label htmlFor={`height-manual${uniqueId}`}>Manuell</Label>
+              <Label htmlFor={`height-manual${uniqueId}`} className={ultrasonicOnly ? 'opacity-40' : undefined}>Manuell</Label>
             </div>
             <div className="flex items-center space-x-2">
               <input 
                 type="radio" 
                 id={`height-tactile${uniqueId}`}
                 name={`height-mode${uniqueId}`}
-                checked={heightMode === 'tactile'} 
+                checked={!ultrasonicOnly && heightMode === 'tactile'} 
                 onChange={() => onHeightModeChange('tactile')} 
+                disabled={ultrasonicOnly}
               />
-              <Label htmlFor={`height-tactile${uniqueId}`}>Taktil</Label>
+              <Label htmlFor={`height-tactile${uniqueId}`} className={ultrasonicOnly ? 'opacity-40' : undefined}>Taktil</Label>
             </div>
           </div>
         </div>

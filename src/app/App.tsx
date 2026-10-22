@@ -51,6 +51,8 @@ import DialogRestartComponent from './imports/DialogRestart';
 import BmiBsaMenu from './components/BmiBsaMenu';
 import { MainScreen, type HeightPanelProps, type LoginBanner } from './main-screen/MainScreen';
 import { TareAssistant } from './flows/TareAssistant';
+import { FigmaScreen } from './figma-screens/FigmaScreen';
+import { SCREENS } from './figma-screens/screens';
 import { MenuFlow } from './flows/MenuFlow';
 import { RecallScreen, ScanIdScreen, IdConfirmedScreen, OverviewScreen, TransmittingScreen, DataSavedScreen, IntegrationInfoScreen } from './flows/SendFlow';
 
@@ -812,6 +814,9 @@ function AppContent() {
     const t = setTimeout(() => setDirectLogin(null), 3000);
     return () => clearTimeout(t);
   }, [directLogin]);
+  // Tare-by-Scanning: "Read pre-tare" for 3 s, then the scanned value is the tare (overrides the persistent pre-tare).
+  const [tareBarcodeKg, setTareBarcodeKg] = useState('0.60');
+  const [tareScan, setTareScan] = useState<number | null>(null);
   const handleBarcodeScan = (kind: 'patient' | 'user') => {
     if (kind === 'patient') setIsPatientLoggedIn(true);
     else setIsUserLoggedIn(true);
@@ -982,6 +987,25 @@ function AppContent() {
   const ptActive = persistentKg > 0 && !tareOverride && !ptSuspended;
   const tareKgNow = () =>
     preTareValues.reduce((sum, v) => sum + parseFloat(v), 0) + (taredWeight ? parseFloat(taredWeight) : 0) + (ptActive ? persistentKg : 0);
+
+  useEffect(() => {
+    if (tareScan === null) return;
+    const t = setTimeout(() => {
+      const kg = tareScan;
+      setTareScan(null);
+      setPreTareValues([kg.toFixed(2)]);
+      setTaredWeight(null);
+      setMotherMode(false);
+      setPtSuspended(true);
+      if (parseFloat(rawWeight) !== 0) {
+        const net = parseFloat(rawWeight) - kg;
+        setWeight((isMetric ? net : kgToLbs(net)).toFixed(2));
+      } else {
+        setWeight((isMetric ? -kg : -kgToLbs(kg)).toFixed(2));
+      }
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [tareScan]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Step off: assistant tares end, the persistent pre-tare applies again.
   const handleStepOff = () => {
@@ -2713,6 +2737,19 @@ function AppContent() {
           );
         })()}
 
+        {/* Tare-by-Scanning feedback: "Read pre-tare" (3 s) */}
+        {tareScan !== null && (
+          <div className="absolute inset-0 z-50">
+            <FigmaScreen
+              data={SCREENS.tareScanRead}
+              text={{
+                'I16748:52105;16748:52046;10631:2249': (-(isMetric ? tareScan : kgToLbs(tareScan))).toFixed(2),
+                'I16748:52105;16748:52046;10631:2245': isMetric ? 'kg' : 'lbs',
+              }}
+            />
+          </div>
+        )}
+
         {/* Previous Value Screen Overlay */}
         {showPreviousValue && (
           <div className="absolute inset-0 z-50">
@@ -2770,6 +2807,9 @@ function AppContent() {
             printing={printing}
           onStepOff={parseFloat(rawWeight) !== 0 || tareOverride ? handleStepOff : undefined}
           onScanBarcode={handleBarcodeScan}
+          tareBarcode={tareBarcodeKg}
+          onTareBarcodeChange={setTareBarcodeKg}
+          onScanTare={() => { const kg = parseFloat(tareBarcodeKg); if (kg > 0) setTareScan(kg); }}
           onReset={handleReset}
           zoomLevel={zoomLevel}
           onZoomLevelChange={setZoomLevel}

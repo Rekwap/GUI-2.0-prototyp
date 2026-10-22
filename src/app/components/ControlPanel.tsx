@@ -24,6 +24,10 @@ interface ControlPanelProps {
   onPretareChange?: (kg: string) => void;
   /** Simulate the patient stepping off the scale (ends assistant tares). */
   onStepOff?: () => void;
+  /** Tare-by-Scanning: value on the simulated tare barcode (kg) and the scan action. */
+  tareBarcode?: string;
+  onTareBarcodeChange?: (kg: string) => void;
+  onScanTare?: () => void;
   uniqueId?: string;
   onReset?: () => void;
   zoomLevel?: number;
@@ -71,6 +75,9 @@ export default function ControlPanel({
   pretare,
   onPretareChange,
   onStepOff,
+  tareBarcode,
+  onTareBarcodeChange,
+  onScanTare,
   uniqueId = '',
   onReset,
   zoomLevel = 100,
@@ -254,6 +261,21 @@ export default function ControlPanel({
           </div>
           )}
         </div>
+        {onScanTare && onTareBarcodeChange && (
+          <div className="flex items-center gap-2 -mt-2">
+            <Label htmlFor={`tare-barcode${uniqueId}`} className="text-xs whitespace-nowrap">Tare barcode (kg)</Label>
+            <Input
+              type="text"
+              inputMode="decimal"
+              id={`tare-barcode${uniqueId}`}
+              value={tareBarcode || ''}
+              onChange={(e) => onTareBarcodeChange(e.target.value)}
+              placeholder="0.60"
+              className="w-20 h-7 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <ScanButton label="Scan tare barcode" onClick={onScanTare} />
+          </div>
+        )}
         {onStepOff && (
           <button
             type="button"

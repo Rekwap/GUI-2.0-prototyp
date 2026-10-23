@@ -29,6 +29,7 @@ import HeightCalibration from "./components/HeightCalibration";
 import Network from "./components/Network";
 import ServerConnection from "./components/ServerConnection";
 import { TactileHeightScreen } from "./flows/TactileHeight";
+import { SendHeightFlow } from "./flows/SendHeight";
 import { DeviceModeScreen, SelfMeasurementFlow } from "./flows/SelfMeasurement";
 import HeightConfirmation from "./components/HeightConfirmation";
 import TactileHeightMeasurementComplete from "./components/TactileHeightMeasurementComplete";
@@ -899,6 +900,8 @@ function AppContent() {
   
   // Height required prompt screen state
   const [showHeightRequiredPrompt, setShowHeightRequiredPrompt] = useState(false);
+  // Height required but missing when sending: "Send with Height" flow (Figma 10795:26042).
+  const [showSendHeight, setShowSendHeight] = useState(false);
   
   // Height confirmation screen state
   const [showHeightConfirmation, setShowHeightConfirmation] = useState(false);
@@ -1379,41 +1382,7 @@ function AppContent() {
 
     // Check if height is required and measured
     if (heightRequired && !heightMeasured) {
-      // Mark that we should show overview after height measurement
-      setPendingSendAfterHeight(true);
-      
-      // Start the height workflow directly instead of showing a prompt
-      if (heightMode === 'manual') {
-        setShowManualInput(true);
-      } else if (heightMode === 'tactile') {
-        setShowTactileHeight(true);
-      } else {
-        // Ultrasonic mode
-        // Standard workflow: Start the height measurement with animation
-        setHeightMeasured(true);
-        setIsHeightUpdating(true);
-        setHeightLoadingBars(0);
-        
-        // Animate bars sequentially - repeat animation twice
-        // First cycle
-        setTimeout(() => setHeightLoadingBars(1), 300);
-        setTimeout(() => setHeightLoadingBars(2), 600);
-        // Second cycle (repeat)
-        setTimeout(() => setHeightLoadingBars(0), 900);
-        setTimeout(() => setHeightLoadingBars(1), 1200);
-        setTimeout(() => setHeightLoadingBars(2), 1500);
-        
-        // After 1800ms, show the height value and automatically show overview
-        setTimeout(() => {
-          setHeightValue(testHeight);
-          setIsHeightUpdating(false);
-          setHeightLoadingBars(0);
-          // Automatically show overview after height measurement completes
-          setPendingSendAfterHeight(false);
-          setShowOverview(true);
-        }, 1800);
-      
-      }
+      setShowSendHeight(true);
       return;
     }
 
@@ -1463,9 +1432,8 @@ function AppContent() {
       // All data present - show overview
       setShowOverview(true);
     } else if (hasWeight && heightRequired && !hasHeight) {
-      // Weight present but height missing and required - show height required prompt from send wizard
-      setHeightRequiredFromSendWizard(true);
-      setShowHeightRequiredPrompt(true);
+      // Weight present but height missing and required - "Send with Height" flow
+      setShowSendHeight(true);
     }
     // Else: return to main screen (no action needed)
   };
@@ -1608,6 +1576,7 @@ function AppContent() {
     setBooting(true);
     if (bootTimer.current) clearTimeout(bootTimer.current);
     bootTimer.current = setTimeout(() => setBooting(false), 800);
+    setShowSendHeight(false);
     setDeviceMode('choose');
     setWeight('0.00');
     setMotherMode(false);
@@ -1625,6 +1594,13 @@ function AppContent() {
     setIsUserLoggedIn(false);
     setHasEverMeasured(false);
     setFirstScannedId(null);
+  };
+
+  const handleSendHeightConfirm = (cm: string) => {
+    setHeightValue(cm);
+    setHeightMeasured(true);
+    setShowSendHeight(false);
+    setShowOverview(true);
   };
 
   const handleToggleControlPanel = () => {
@@ -2229,6 +2205,54 @@ function AppContent() {
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-manual-tare"
+            onReset={handleReset}
+            zoomLevel={zoomLevel}
+            onZoomLevelChange={setZoomLevel}
+          />
+        )}
+      </div>
+    );
+  }
+
+  if (showSendHeight) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
+        <div 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
+          data-name="Send with Height"
+          style={{ 
+            transform: `scale(${zoomLevel / 100})`,
+            transformOrigin: 'center center'
+          }}
+        >
+          <SendHeightFlow
+            heightMode={heightMode}
+            isMetric={isMetric}
+            targetCm={parseFloat(testHeight) || 0}
+            formatImperial={convertCmToFeetInches}
+            onBack={() => setShowSendHeight(false)}
+            onConfirm={handleSendHeightConfirm}
+          />
+        </div>
+        {showControlPanel && (
+          <ControlPanel 
+            heightMode={heightMode}
+            onHeightModeChange={setHeightMode}
+            heightRequired={heightRequired}
+            onHeightRequiredChange={setHeightRequired}
+            installationMode={installationMode}
+            onInstallationModeChange={setInstallationMode}
+            isMetric={isMetric}
+            onIsMetricChange={setIsMetric}
+            loginMode={loginMode}
+            onLoginModeChange={setLoginMode}
+            testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
+            onTestHeightChange={handleTestHeightChange}
+            pretare={pretare}
+            onPretareChange={handlePretareChange}
+            uniqueId="-send-height"
             onReset={handleReset}
             zoomLevel={zoomLevel}
             onZoomLevelChange={setZoomLevel}

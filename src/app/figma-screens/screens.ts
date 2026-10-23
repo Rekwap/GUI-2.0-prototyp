@@ -121,6 +121,11 @@ import smLanguage from './screens/14944-53606.json';
 import smNoBarcode from './screens/14582-48727.json';
 import bootScreen from './screens/14562-54417.json';
 import recallHeight from './screens/11189-21956.json';
+import hrAddValue from './screens/11178-33489.json';
+import hrUssMeasuring from './screens/11178-34108.json';
+import hrUssResult from './screens/11178-33520.json';
+import hrTactile from './screens/11178-33075.json';
+import hrManual from './screens/11178-33117.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -243,6 +248,11 @@ export const SCREENS = {
   smNoBarcode: smNoBarcode as unknown as FNode,
   bootScreen: bootScreen as unknown as FNode,
   recallHeight: recallHeight as unknown as FNode,
+  hrAddValue: hrAddValue as unknown as FNode,
+  hrUssMeasuring: hrUssMeasuring as unknown as FNode,
+  hrUssResult: hrUssResult as unknown as FNode,
+  hrTactile: hrTactile as unknown as FNode,
+  hrManual: hrManual as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -365,5 +375,10 @@ export const FIGMA_IDS = {
   "smLanguage": "14944:53606",
   "smNoBarcode": "14582:48727",
   "bootScreen": "14562:54417",
-  "recallHeight": "11189:21956"
+  "recallHeight": "11189:21956",
+  "hrAddValue": "11178:33489",
+  "hrUssMeasuring": "11178:34108",
+  "hrUssResult": "11178:33520",
+  "hrTactile": "11178:33075",
+  "hrManual": "11178:33117"
 } as const;

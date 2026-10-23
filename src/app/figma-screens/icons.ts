@@ -11,10 +11,12 @@ import i172jp08 from './icons/i172jp08.svg';
 import i17kufyc from './icons/i17kufyc.svg';
 import i17xkcfq from './icons/i17xkcfq.svg';
 import i1a0z1mm from './icons/i1a0z1mm.svg';
+import i1a3vyt4 from './icons/i1a3vyt4.svg';
 import i1bf7dg9 from './icons/i1bf7dg9.svg';
 import i1c1lxp from './icons/i1c1lxp.svg';
 import i1c478na from './icons/i1c478na.svg';
 import i1c88036 from './icons/i1c88036@4x.png';
+import i1c8rai0 from './icons/i1c8rai0.svg';
 import i1d38roy from './icons/i1d38roy@4x.png';
 import i1d68c3r from './icons/i1d68c3r.svg';
 import i1ehncmt from './icons/i1ehncmt.svg';
@@ -38,6 +40,7 @@ import i1ljtby6 from './icons/i1ljtby6.svg';
 import i1loxdap from './icons/i1loxdap@4x.png';
 import i1mcd5o5 from './icons/i1mcd5o5.svg';
 import i1n4k4p0 from './icons/i1n4k4p0.svg';
+import i1np67vj from './icons/i1np67vj.svg';
 import i1o9m7qg from './icons/i1o9m7qg.svg';
 import i1oahwhx from './icons/i1oahwhx.svg';
 import i1pb0oiw from './icons/i1pb0oiw.svg';
@@ -56,6 +59,7 @@ import i1w5nz6d from './icons/i1w5nz6d.svg';
 import i1wbop53 from './icons/i1wbop53.svg';
 import i1wmjuup from './icons/i1wmjuup.svg';
 import i1xnnk1p from './icons/i1xnnk1p.svg';
+import i26t4rk from './icons/i26t4rk.svg';
 import i2necxr from './icons/i2necxr.svg';
 import i4r006o from './icons/i4r006o.svg';
 import i50rwii from './icons/i50rwii.svg';
@@ -66,6 +70,7 @@ import i72822y from './icons/i72822y.svg';
 import i86lhew from './icons/i86lhew.svg';
 import i92gran from './icons/i92gran.svg';
 import i93f8jz from './icons/i93f8jz.svg';
+import i953xwz from './icons/i953xwz.svg';
 import ibswn7v from './icons/ibswn7v.svg';
 import ic6gxk8 from './icons/ic6gxk8.svg';
 import iecc8vc from './icons/iecc8vc.svg';
@@ -92,6 +97,7 @@ import iszmjn9 from './icons/iszmjn9.svg';
 import it0lxy7 from './icons/it0lxy7.svg';
 import itfxbp from './icons/itfxbp.svg';
 import itsieqn from './icons/itsieqn.svg';
+import iu2oatj from './icons/iu2oatj.svg';
 import iujkas9 from './icons/iujkas9.svg';
 import iv3b3an from './icons/iv3b3an.svg';
 import ivttp4g from './icons/ivttp4g.svg';
@@ -119,10 +125,12 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i17kufyc: { src: i17kufyc, w: 50, h: 50 },
   i17xkcfq: { src: i17xkcfq, w: 24, h: 24 },
   i1a0z1mm: { src: i1a0z1mm, w: 140, h: 50 },
+  i1a3vyt4: { src: i1a3vyt4, w: 84, h: 68 },
   i1bf7dg9: { src: i1bf7dg9, w: 268, h: 68 },
   i1c1lxp: { src: i1c1lxp, w: 50, h: 50 },
   i1c478na: { src: i1c478na, w: 136, h: 24 },
   i1c88036: { src: i1c88036, w: 200, h: 154 },
+  i1c8rai0: { src: i1c8rai0, w: 80, h: 80 },
   i1d38roy: { src: i1d38roy, w: 248, h: 278 },
   i1d68c3r: { src: i1d68c3r, w: 260, h: 2 },
   i1ehncmt: { src: i1ehncmt, w: 50, h: 50 },
@@ -146,6 +154,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i1loxdap: { src: i1loxdap, w: 270, h: 306 },
   i1mcd5o5: { src: i1mcd5o5, w: 32, h: 32 },
   i1n4k4p0: { src: i1n4k4p0, w: 62, h: 48 },
+  i1np67vj: { src: i1np67vj, w: 184, h: 68 },
   i1o9m7qg: { src: i1o9m7qg, w: 32, h: 32 },
   i1oahwhx: { src: i1oahwhx, w: 36, h: 36 },
   i1pb0oiw: { src: i1pb0oiw, w: 140, h: 50 },
@@ -164,6 +173,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i1wbop53: { src: i1wbop53, w: 140, h: 50 },
   i1wmjuup: { src: i1wmjuup, w: 230, h: 38 },
   i1xnnk1p: { src: i1xnnk1p, w: 252, h: 142 },
+  i26t4rk: { src: i26t4rk, w: 36, h: 36 },
   i2necxr: { src: i2necxr, w: 32, h: 32 },
   i4r006o: { src: i4r006o, w: 160, h: 96 },
   i50rwii: { src: i50rwii, w: 80, h: 80 },
@@ -174,6 +184,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i86lhew: { src: i86lhew, w: 160, h: 96 },
   i92gran: { src: i92gran, w: 24, h: 24 },
   i93f8jz: { src: i93f8jz, w: 235, h: 52 },
+  i953xwz: { src: i953xwz, w: 80, h: 80 },
   ibswn7v: { src: ibswn7v, w: 24, h: 24 },
   ic6gxk8: { src: ic6gxk8, w: 32, h: 32 },
   iecc8vc: { src: iecc8vc, w: 32, h: 32 },
@@ -200,6 +211,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   it0lxy7: { src: it0lxy7, w: 80, h: 80 },
   itfxbp: { src: itfxbp, w: 32, h: 32 },
   itsieqn: { src: itsieqn, w: 2, h: 416 },
+  iu2oatj: { src: iu2oatj, w: 270, h: 306 },
   iujkas9: { src: iujkas9, w: 80, h: 80 },
   iv3b3an: { src: iv3b3an, w: 160, h: 40 },
   ivttp4g: { src: ivttp4g, w: 88, h: 60 },

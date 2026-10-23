@@ -4,6 +4,7 @@
 //   libary_Height + BMI, Button Bar (integrated).
 import type { ReactNode } from 'react';
 import { Box, COLORS, Icon, Text, resetButton, usePressed } from './primitives';
+import { useT } from '../i18n';
 
 import menuIcon from './assets/icons/menu.svg';
 import wifiIcon from './assets/icons/wifi.svg';
@@ -110,6 +111,7 @@ export type WeightPanelProps =
     };
 
 export function WeightPanel(props: WeightPanelProps) {
+  const t = useT();
   return (
     <Box x={0} y={50} w={272} h={200} style={{ background: COLORS.panel, overflow: 'hidden' }}>
       {props.state === 'error' ? (
@@ -122,7 +124,7 @@ export function WeightPanel(props: WeightPanelProps) {
           {props.secondRangeText && (
             <Text x={16} y={30} w={228} h={18} size={13} weight="medium" color={COLORS.textSecondRange}>{props.secondRangeText}</Text>
           )}
-          {props.showNet && <Text x={216} y={59} w={40} h={27} size={20} weight="medium" color={COLORS.textSecondary} align="right">Net</Text>}
+          {props.showNet && <Text x={216} y={59} w={40} h={27} size={20} weight="medium" color={COLORS.textSecondary} align="right">{t('KEY_NET', 'Net')}</Text>}
           {/* Value: auto-width text, right edge at x=260, top 65 */}
           <Text x={0} y={65} w={260} size={83} weight="semibold" align="right" onClick={props.onValueClick}>{props.value}</Text>
           {props.showBaby && <Icon src={laundryIcon} x={168} y={165} w={24} h={24} />}
@@ -209,6 +211,7 @@ export type HeightPanelProps =
     };
 
 export function HeightPanel(props: HeightPanelProps) {
+  const t = useT();
   return (
     <Box x={0} y={308} w={272} h={100} style={{ background: COLORS.white }}>
       {props.state === 'start' && (
@@ -219,7 +222,7 @@ export function HeightPanel(props: HeightPanelProps) {
       {props.state === 'stepOnScale' && (
         <>
           <Icon src={stepsIcon} x={96} y={12} w={80} h={50} />
-          <Text x={12} y={62} w={248} h={27} size={20} weight="bold" align="center">Scale ready</Text>
+          <Text x={12} y={62} w={248} h={27} size={20} weight="bold" align="center">{t('KEY_STEPON', 'Scale ready')}</Text>
         </>
       )}
       {props.state === 'measuring' && <Box x={96} y={14} w={80} h={80}>{props.indicator}</Box>}
@@ -263,14 +266,15 @@ function BarButton({ x, icon, label, active, onClick }: { x: number; icon: strin
 }
 
 export function ButtonBar({ onTare, onRecall, onConfirm, standalone, print }: ButtonBarProps) {
+  const t = useT();
   return (
     <Box x={0} y={408} w={272} h={72} style={{ background: COLORS.white }}>
       <Icon src={buttonBarBg} x={0} y={0} w={272} h={72} />
-      <BarButton x={12} icon={tare48Icon} label="TARE" onClick={onTare} />
-      <BarButton x={95} icon={recall48Icon} label="RECALL" onClick={onRecall} />
+      <BarButton x={12} icon={tare48Icon} label={t('KEY_TARE', 'TARE')} onClick={onTare} />
+      <BarButton x={95} icon={recall48Icon} label={t('KEY_RECALL', 'RECALL')} onClick={onRecall} />
       {print
-        ? <BarButton x={178} icon={print48Icon} label="PRINT" onClick={onConfirm} />
-        : <BarButton x={178} icon={standalone ? send48StandaloneIcon : send48Icon} label="CONFIRM" active={!standalone} onClick={onConfirm} />}
+        ? <BarButton x={178} icon={print48Icon} label={t('KEY_PRINT', 'PRINT')} onClick={onConfirm} />
+        : <BarButton x={178} icon={standalone ? send48StandaloneIcon : send48Icon} label={t('KEY_SEND_HOME', 'CONFIRM')} active={!standalone} onClick={onConfirm} />}
     </Box>
   );
 }

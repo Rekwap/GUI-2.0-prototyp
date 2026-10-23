@@ -10,7 +10,8 @@
 //   hide    – hide nodes
 //   onClick – make a node clickable
 //   replace – render a custom element in place of a node (same box)
-import type { CSSProperties, ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { FONT_STEP, OVERFLOWS, SHRUNK, translate, useLang } from '../i18n';
 import '../../styles/device-fonts.css';
 import { ICONS } from './icons';
 
@@ -90,8 +91,38 @@ function radius(r: FNode['r']): string | undefined {
 
 function TextNode({ n, override, parentW }: { n: FNode; override?: string; parentW: number }) {
   const [h, v, auto] = (n.a ?? 'LTN').split('');
+  const lang = useLang();
   const runs = n.s ?? [];
-  const content = override !== undefined && runs.length ? [[override, ...runs[0].slice(1)]] : runs;
+  // Overrides (dynamic values) win; otherwise a Figma text key is translated into the device language.
+  const translated = override === undefined && n.kk && lang !== 'en' && runs.length
+    ? translate(lang, n.kk, runs.map(r => r[0]).join(''))
+    : undefined;
+  const base = override ?? translated;
+  const [step, setStep] = useState(0);
+  const pRef = useRef<HTMLParagraphElement>(null);
+  useEffect(() => setStep(0), [base]);
+  // Re-check once the device font has loaded (metrics change after the fallback font).
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (translated === undefined) return;
+    let alive = true;
+    document.fonts?.ready.then(() => alive && setTick(t => t + 1));
+    const ro = new ResizeObserver(() => setTick(t => t + 1));
+    if (pRef.current) ro.observe(pRef.current);
+    return () => { alive = false; ro.disconnect(); };
+  }, [translated]);
+  // Too long for the Figma box → one font size smaller; still too long → listed for review.
+  useLayoutEffect(() => {
+    const el = pRef.current;
+    if (!el || translated === undefined || auto === 'W') return;
+    const over = el.scrollHeight > n.h + 2 || el.scrollWidth > n.w + 1;
+    const key = `${n.kk} (${lang})`;
+    if (over && step === 0 && FONT_STEP[runs[0][3] as number]) { setStep(1); SHRUNK.set(key, translated); }
+    else if (over) OVERFLOWS.set(key, translated);
+    else OVERFLOWS.delete(key);
+  });
+  const fit = (size: number) => (step && FONT_STEP[size] ? FONT_STEP[size] : size);
+  const content = base !== undefined && runs.length ? [[base, ...runs[0].slice(1)]] : runs;
   // Auto-width text grows from its anchor (right-aligned grows to the left, centred both ways).
   const box: CSSProperties =
     auto !== 'W'
@@ -118,14 +149,15 @@ function TextNode({ n, override, parentW }: { n: FNode; override?: string; paren
           overflowWrap: 'break-word',
           lineHeight: 'normal',
           // Strut = first run's font, so the inherited page font size cannot widen line boxes.
-          ...(content[0] ? { ...fontOf(content[0][1] as string, content[0][2] as string), fontSize: content[0][3] as number } : {}),
+          ...(content[0] ? { ...fontOf(content[0][1] as string, content[0][2] as string), fontSize: fit(content[0][3] as number) } : {}),
         }}
+        ref={pRef}
       >
         {content.map((run, idx) => {
           const [chars, family, style, size, color, ls, lh, tcase, deco] = run as [string, string, string, number, string | null, string | number, string | number, string, string];
           const css: CSSProperties = {
             ...fontOf(family, style),
-            fontSize: size,
+            fontSize: fit(size),
             color: color ?? undefined,
             letterSpacing: ls ? ls : 0,
             lineHeight: lh ? (typeof lh === 'number' ? `${lh}px` : lh) : 'normal',

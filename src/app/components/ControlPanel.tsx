@@ -2,6 +2,7 @@ import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { BUILD_STAMP } from "../version";
+import { LANGS, setLang, useLang } from "../i18n";
 import { Slider } from "./ui/slider";
 import { useEffect, useRef, useState, type ComponentProps } from "react";
 
@@ -124,6 +125,7 @@ export default function ControlPanel({
   ultrasonicOnly = false,
   printing = false
 }: ControlPanelProps) {
+  const lang = useLang();
   const wf = isMetric ? 1 : KG_TO_LBS;
   const hf = isMetric ? 1 : CM_TO_IN;
   const wu = isMetric ? 'kg' : 'lbs';
@@ -147,6 +149,17 @@ export default function ControlPanel({
             <Switch id={`unit-system${uniqueId}`} checked={!isMetric} onCheckedChange={(checked) => onIsMetricChange(!checked)} />
             <Label htmlFor={`unit-system${uniqueId}`}>Imperial (lbs / ft'in)</Label>
           </div>
+        </div>
+
+        {/* Device language (texts from the Figma text keys) */}
+        <div className="flex items-center gap-3">
+          <Label>Language</Label>
+          {LANGS.map(({ value, label }) => (
+            <div key={value} className="flex items-center space-x-1">
+              <input type="radio" id={`lang-${value}${uniqueId}`} name={`lang${uniqueId}`} checked={lang === value} onChange={() => setLang(value)} />
+              <Label htmlFor={`lang-${value}${uniqueId}`}>{label}</Label>
+            </div>
+          ))}
         </div>
 
         {/* Separator */}

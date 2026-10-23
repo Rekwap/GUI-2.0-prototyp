@@ -3,6 +3,7 @@
 // only maps state onto them.
 import { FigmaNode, FigmaScreen, HitArea, findNode } from '../figma-screens/FigmaScreen';
 import { SCREENS } from '../figma-screens/screens';
+import { useT } from '../i18n';
 
 const KG_TO_LBS = 2.20462;
 
@@ -18,6 +19,7 @@ function weightText(kg: number, isMetric: boolean) {
 /* ------------------------------------------------------------------ */
 
 export function RecallScreen({ weightKg, tareKg, minutesAgo, isMetric, onClose }: { weightKg: number; tareKg: number; minutesAgo: number; isMetric: boolean; onClose: () => void }) {
+  const t = useT();
   const p = 'I12561:40069;12067:4852;';
   const unit = isMetric ? 'kg' : 'lbs';
   return (
@@ -26,7 +28,7 @@ export function RecallScreen({ weightKg, tareKg, minutesAgo, isMetric, onClose }
       text={{
         [p + '10631:2249']: weightText(weightKg, isMetric),
         [p + '10631:2245']: unit,
-        [p + '10631:2256']: `${minutesAgo} min ago.`,
+        [p + '10631:2256']: t('KEY_MIN_AGO', '%1 min ago.').replace('%1', String(minutesAgo)),
         [p + '10631:2257;9948:73']: `-${weightText(tareKg, isMetric)} ${unit}`,
       }}
       hide={tareKg > 0 ? [] : [p + '10631:2257']}

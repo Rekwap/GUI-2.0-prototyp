@@ -6,7 +6,7 @@
 // down by the patient resp. printed. Screens are 1:1 Figma exports;
 // this file only adds behaviour and timing.
 import { useEffect, useRef, useState } from 'react';
-import { FigmaScreen, HitArea } from '../figma-screens/FigmaScreen';
+import { FigmaScreen, HitArea, type FNode as FigmaNode } from '../figma-screens/FigmaScreen';
 import { SCREENS } from '../figma-screens/screens';
 import { DEMO_PATIENT } from './SendFlow';
 
@@ -33,11 +33,54 @@ export function DeviceModeScreen({ onGuided, onSelf, pretareText }: { onGuided: 
 }
 
 /** Self-measurement start: "Step onto the scale." */
-export function StepOnScaleScreen({ onStepOn }: { onStepOn?: () => void }) {
+export function StepOnScaleScreen({ onStepOn, lang, onLanguage }: { onStepOn?: () => void; lang?: string; onLanguage?: () => void }) {
   return (
-    <FigmaScreen data={SCREENS.stepOnScale}>
+    <FigmaScreen data={SCREENS.stepOnScale} text={lang ? { 'I14010:59948;12929:26775': lang } : undefined}>
       {/* Stepping onto the platform is simulated by tapping the scale. */}
       {onStepOn && <HitArea x={0} y={50} w={272} h={430} label="Step onto the scale" onClick={onStepOn} />}
+      {onLanguage && <HitArea x={172} y={0} w={100} h={50} label="Language" onClick={onLanguage} />}
+    </FigmaScreen>
+  );
+}
+
+/* Language selection (Figma 14010:59913, component "Language" temporary/selected). */
+const LANGS: { code: string; row: string }[] = [
+  { code: 'eng', row: 'I14952:8106;14944:54403' },
+  { code: 'deu', row: 'I14952:8111;15085:7947' },
+  { code: 'esp', row: 'I14952:8112;15744:23' },
+  { code: 'fra', row: 'I14952:8107;15744:55' },
+  { code: 'ita', row: 'I14952:8108;15744:86' },
+  { code: 'por', row: 'I14952:8109;15744:119' },
+  { code: 'nld', row: 'I14952:8110;15744:152' },
+];
+const PAGING_ROW = '14944:53609';
+
+/** "selected" variant: highlight in the row background, check button instead of paging. */
+function languageData(selected: number | null): FigmaNode {
+  if (selected === null) return SCREENS.smLanguage as FigmaNode;
+  const target = LANGS[selected].row;
+  const clone = (n: FigmaNode): FigmaNode => {
+    const c = n.c?.map(clone);
+    if (n.i === target) {
+      // Highlight sits above the separator, below label and flag (as in the "selected" variant).
+      const kids = c ?? [];
+      return { ...n, c: [kids[0], { x: 5, y: 4, w: 250, h: 44, t: 'F', f: '#98a7d8', r: 4 } as FigmaNode, ...kids.slice(1)].filter(Boolean) };
+    }
+    if (n.i === PAGING_ROW) return { x: 56, y: 428, w: 160, h: 40, t: 'S', k: 'iv3b3an' } as FigmaNode;
+    return c ? { ...n, c } : n;
+  };
+  return clone(SCREENS.smLanguage as FigmaNode);
+}
+
+export function LanguageScreen({ onBack, onConfirm }: { onBack: () => void; onConfirm: (code: string) => void }) {
+  const [sel, setSel] = useState<number | null>(null);
+  return (
+    <FigmaScreen data={languageData(sel)}>
+      <HitArea x={0} y={0} w={50} h={50} label="Back" onClick={onBack} />
+      {LANGS.map((l, i) => (
+        <HitArea key={l.code} x={6} y={58 + 52 * i} w={260} h={52} label={l.code} onClick={() => setSel(i)} />
+      ))}
+      {sel !== null && <HitArea x={56} y={428} w={160} h={40} label="Confirm language" onClick={() => onConfirm(LANGS[sel].code)} />}
     </FigmaScreen>
   );
 }
@@ -99,6 +142,8 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
   const integrated = installation === 'integrated';
   const print = installation === 'simpleprint';
   const [step, setStep] = useState<Step>('start');
+  // Language selection is only shown (prototype): the language itself does not change.
+  const [langFrom, setLangFrom] = useState<Step | null>(null);
   const [shownKg, setShownKg] = useState(0);
   const [count, setCount] = useState(3);
   const raf = useRef<number | null>(null);
@@ -149,9 +194,13 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
   const ptText = `${w(pretareKg)} ${wUnit}`;
   const startCountdown = () => { setCount(3); setStep('countdown'); };
 
+  if (langFrom) {
+    return <LanguageScreen onBack={() => setLangFrom(null)} onConfirm={() => setLangFrom(null)} />;
+  }
+
   switch (step) {
     case 'start':
-      return <StepOnScaleScreen onStepOn={go('remove')} />;
+      return <StepOnScaleScreen onStepOn={go('remove')} onLanguage={() => setLangFrom('start')} />;
 
     case 'remove':
       return <FigmaScreen data={SCREENS.smRemove} onClick={{ 'I14010:59770;13152:46117;13152:49129': go(integrated ? 'scan' : 'weigh') }} />;
@@ -161,6 +210,7 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
         <FigmaScreen data={SCREENS.smScan}>
           {/* Tapping the screen simulates scanning the patient barcode. */}
           <HitArea x={0} y={50} w={272} h={350} label="Simulate scan" onClick={go('welcome')} />
+          <HitArea x={172} y={0} w={100} h={50} label="Language" onClick={() => setLangFrom('scan')} />
         </FigmaScreen>
       );
 

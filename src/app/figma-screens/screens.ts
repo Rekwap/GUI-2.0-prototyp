@@ -117,6 +117,7 @@ import mPretareSet from './screens/13061-27010.json';
 import deviceModePt from './screens/14010-59908.json';
 import woYourWeightPt from './screens/14010-59822.json';
 import tareScanRead from './screens/16748-52157.json';
+import smLanguage from './screens/14944-53606.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -235,6 +236,7 @@ export const SCREENS = {
   deviceModePt: deviceModePt as unknown as FNode,
   woYourWeightPt: woYourWeightPt as unknown as FNode,
   tareScanRead: tareScanRead as unknown as FNode,
+  smLanguage: smLanguage as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -353,5 +355,6 @@ export const FIGMA_IDS = {
   "mPretareSet": "13061:27010",
   "deviceModePt": "14010:59908",
   "woYourWeightPt": "14010:59822",
-  "tareScanRead": "16748:52157"
+  "tareScanRead": "16748:52157",
+  "smLanguage": "14944:53606"
 } as const;

@@ -951,14 +951,14 @@ function AppContent() {
   // - Mosteller: BSA = √(height × weight / 3600)
   // BMI formula: BMI = weight [kg] / (height [m])²
   const calculateBsaOrBmi = (mode: string): string => {
-    const weightNum = parseFloat(rawWeight); // Use rawWeight (always in kg) instead of weight (could be lbs)
+    const weightNum = parseFloat(weight); // Net weight in kg (gross minus tare / pre-tare)
     
     // Use testHeight instead of heightValue
     if (!testHeight) {
       return '---';
     }
     
-    const heightNum = parseFloat(testHeight);
+    const heightNum = parseFloat(heightValue ?? testHeight); // measured / entered height
     
     // Show --- for zero, negative, or invalid weight
     if (weightNum <= 0 || isNaN(weightNum)) {
@@ -2808,7 +2808,7 @@ function AppContent() {
               const rec = lastSent ?? { weightKg: parseFloat(rawWeight) - tareNow, tareKg: tareNow, time: Date.now(), heightCm: heightMeasured ? (heightValue ?? testHeight) : null };
               // Recalled height with BMI/BSA from the recalled values.
               const recH = rec.heightCm !== null ? parseFloat(rec.heightCm) : NaN;
-              const recW = rec.weightKg + rec.tareKg; // same basis as the main screen (gross weight)
+              const recW = rec.weightKg; // net weight, as on the main screen
               const label = getDisplayLabel();
               const ratio = selectedMode === 'bmi'
                 ? recW / Math.pow(recH / 100, 2)

@@ -932,7 +932,8 @@ function AppContent() {
     if (!isMetric) {
       return convertCmToFeetInches(heightInCm);
     }
-    return heightInCm;
+    const cm = parseFloat(heightInCm);
+    return isNaN(cm) ? heightInCm : cm.toFixed(1);
   };
   
   const formatWeight = (weightInKg: string): string => {
@@ -1086,6 +1087,13 @@ function AppContent() {
     setWeight(net.toFixed(2));
   };
 
+  // Changing the test height updates a measured height live (like the weight); a manual entry stays.
+  const handleTestHeightChange = (value: string) => {
+    setTestHeight(value);
+    if (heightMode === 'manual' || heightValue === null || isNaN(parseFloat(value))) return;
+    setHeightValue(value);
+  };
+
   const handleReweight = () => {
     setIsReweighting(true);
     // Use rawWeight (stored in kg) instead of weight (could be lbs or affected by tare)
@@ -1177,7 +1185,8 @@ function AppContent() {
       setTimeout(() => {
         setIsHeightUpdating(false);
         setHeightLoadingBars(0);
-        // Height value stays the same (167.7) but the animation gives visual feedback
+        // Re-measurement takes the current test height from the control panel.
+        setHeightValue(testHeight);
       }, 800);
     
     }
@@ -1736,7 +1745,7 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             testWeight={testWeight}
@@ -1781,7 +1790,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-menu"
@@ -1825,7 +1834,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-calibration"
@@ -1866,7 +1875,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-integration"
@@ -1912,7 +1921,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-network"
@@ -1960,7 +1969,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-server"
@@ -2009,7 +2018,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-tactile"
@@ -2055,7 +2064,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-tactile-complete"
@@ -2102,7 +2111,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-confirmation"
@@ -2170,7 +2179,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-tare"
@@ -2216,7 +2225,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-manual-tare"
@@ -2263,7 +2272,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-manual-height"
@@ -2307,7 +2316,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-height-required"
@@ -2346,7 +2355,7 @@ function AppContent() {
             loginMode={loginMode}
             onLoginModeChange={setLoginMode}
             testHeight={testHeight}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             testWeight={testWeight}
@@ -2389,7 +2398,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-direct-login"
@@ -2430,7 +2439,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-scan-patient"
@@ -2471,7 +2480,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-patient-id"
@@ -2512,7 +2521,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-scan-user"
@@ -2553,7 +2562,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-user-id"
@@ -2599,7 +2608,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-both-ids"
@@ -2648,7 +2657,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-overview"
@@ -2689,7 +2698,7 @@ function AppContent() {
             testHeight={testHeight}
             testWeight={testWeight}
             onTestWeightChange={handleTestWeightChange}
-            onTestHeightChange={setTestHeight}
+            onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-data-saved"
@@ -2841,7 +2850,7 @@ function AppContent() {
           testHeight={testHeight}
           testWeight={testWeight}
           onTestWeightChange={handleTestWeightChange}
-          onTestHeightChange={setTestHeight}
+          onTestHeightChange={handleTestHeightChange}
             pretare={pretare}
             onPretareChange={handlePretareChange}
           uniqueId="-main"

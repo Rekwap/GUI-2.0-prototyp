@@ -907,7 +907,7 @@ function AppContent() {
   const [showDataSaved, setShowDataSaved] = useState(false);
   const [showTransmitting, setShowTransmitting] = useState(false);
   // Last sent measurement, shown by RECALL
-  const [lastSent, setLastSent] = useState<{ weightKg: number; tareKg: number; time: number } | null>(null);
+  const [lastSent, setLastSent] = useState<{ weightKg: number; tareKg: number; time: number; heightCm: string | null } | null>(null);
   
   // Track if we should show overview after height measurement (when triggered from Send button)
   const [pendingSendAfterHeight, setPendingSendAfterHeight] = useState(false);
@@ -1433,7 +1433,7 @@ function AppContent() {
     setShowOverview(false);
     // Remember the sent values for RECALL
     const tareKg = tareKgNow();
-    setLastSent({ weightKg: parseFloat(rawWeight) - tareKg, tareKg, time: Date.now() });
+    setLastSent({ weightKg: parseFloat(rawWeight) - tareKg, tareKg, time: Date.now(), heightCm: heightMeasured ? (heightValue ?? testHeight) : null });
     // Transmitting data ... → Data saved → main screen
     setShowTransmitting(true);
     setTimeout(() => {
@@ -2805,13 +2805,26 @@ function AppContent() {
           <div className="absolute inset-0 z-50">
             {(() => {
               const tareNow = tareKgNow();
-              const rec = lastSent ?? { weightKg: parseFloat(rawWeight) - tareNow, tareKg: tareNow, time: Date.now() };
+              const rec = lastSent ?? { weightKg: parseFloat(rawWeight) - tareNow, tareKg: tareNow, time: Date.now(), heightCm: heightMeasured ? (heightValue ?? testHeight) : null };
+              // Recalled height with BMI/BSA from the recalled values.
+              const recH = rec.heightCm !== null ? parseFloat(rec.heightCm) : NaN;
+              const recW = rec.weightKg + rec.tareKg; // same basis as the main screen (gross weight)
+              const label = getDisplayLabel();
+              const ratio = selectedMode === 'bmi'
+                ? recW / Math.pow(recH / 100, 2)
+                : selectedMode === 'bsa-haycock'
+                  ? 0.024265 * Math.pow(recH, 0.3964) * Math.pow(recW, 0.5378)
+                  : Math.sqrt((recH * recW) / 3600);
+              const recallHeight = !isNaN(recH) && recW > 0
+                ? { value: formatHeight(rec.heightCm), unit: isMetric ? 'cm' : 'ft\'in"', bmi: ratio.toFixed(1), bmiLabel: label === 'BSA' ? 'm²' : label }
+                : undefined;
               return (
                 <RecallScreen
                   weightKg={rec.weightKg}
                   tareKg={rec.tareKg}
                   minutesAgo={Math.max(1, Math.round((Date.now() - rec.time) / 60000))}
                   isMetric={isMetric}
+                  height={recallHeight}
                   onClose={() => setShowPreviousValue(false)}
                 />
               );

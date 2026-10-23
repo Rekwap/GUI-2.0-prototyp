@@ -120,6 +120,7 @@ import tareScanRead from './screens/16748-52157.json';
 import smLanguage from './screens/14944-53606.json';
 import smNoBarcode from './screens/14582-48727.json';
 import bootScreen from './screens/14562-54417.json';
+import recallHeight from './screens/11189-21956.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -241,6 +242,7 @@ export const SCREENS = {
   smLanguage: smLanguage as unknown as FNode,
   smNoBarcode: smNoBarcode as unknown as FNode,
   bootScreen: bootScreen as unknown as FNode,
+  recallHeight: recallHeight as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -362,5 +364,6 @@ export const FIGMA_IDS = {
   "tareScanRead": "16748:52157",
   "smLanguage": "14944:53606",
   "smNoBarcode": "14582:48727",
-  "bootScreen": "14562:54417"
+  "bootScreen": "14562:54417",
+  "recallHeight": "11189:21956"
 } as const;

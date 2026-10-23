@@ -18,21 +18,33 @@ function weightText(kg: number, isMetric: boolean) {
 /* Recall                                                               */
 /* ------------------------------------------------------------------ */
 
-export function RecallScreen({ weightKg, tareKg, minutesAgo, isMetric, onClose }: { weightKg: number; tareKg: number; minutesAgo: number; isMetric: boolean; onClose: () => void }) {
+export type RecallHeight = { value: string; unit: string; bmi: string; bmiLabel: string };
+
+export function RecallScreen({ weightKg, tareKg, minutesAgo, isMetric, height, onClose }: { weightKg: number; tareKg: number; minutesAgo: number; isMetric: boolean; height?: RecallHeight; onClose: () => void }) {
   const t = useT();
-  const p = 'I12561:40069;12067:4852;';
+  // Without a height measurement: weight only (12561:39937); with height: weight + height + BMI (11189:21956).
+  const root = height ? 'I11189:21956;' : 'I12561:40069;';
+  const p = root + '12067:4852;';
+  const h = root + '11191:19118;';
   const unit = isMetric ? 'kg' : 'lbs';
+  const text: Record<string, string> = {
+    [p + '10631:2249']: weightText(weightKg, isMetric),
+    [p + '10631:2245']: unit,
+    [p + '10631:2256']: t('KEY_MIN_AGO', '%1 min ago.').replace('%1', String(minutesAgo)),
+    [p + '10631:2257;9948:73']: `-${weightText(tareKg, isMetric)} ${unit}`,
+  };
+  if (height) {
+    text[h + '10620:1915'] = height.value;
+    text[h + '10620:1917'] = height.unit;
+    text[h + '10620:1921'] = height.bmi;
+    if (height.bmiLabel !== 'BMI') text[h + '10620:1919'] = height.bmiLabel;
+  }
   return (
     <FigmaScreen
-      data={SCREENS.recall}
-      text={{
-        [p + '10631:2249']: weightText(weightKg, isMetric),
-        [p + '10631:2245']: unit,
-        [p + '10631:2256']: t('KEY_MIN_AGO', '%1 min ago.').replace('%1', String(minutesAgo)),
-        [p + '10631:2257;9948:73']: `-${weightText(tareKg, isMetric)} ${unit}`,
-      }}
+      data={height ? SCREENS.recallHeight : SCREENS.recall}
+      text={text}
       hide={tareKg > 0 ? [] : [p + '10631:2257']}
-      onClick={{ 'I12561:40069;11191:19108': onClose }}
+      onClick={{ [root + '11191:19108']: onClose }}
     />
   );
 }

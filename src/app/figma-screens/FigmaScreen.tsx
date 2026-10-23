@@ -98,27 +98,29 @@ function TextNode({ n, override, parentW }: { n: FNode; override?: string; paren
     ? translate(lang, n.kk, runs.map(r => r[0]).join(''))
     : undefined;
   const base = override ?? translated;
+  // Fit check for translated texts, incl. dynamic overrides built from a text key (non-English).
+  const checked = translated ?? (lang !== 'en' && n.kk ? override : undefined);
   const [step, setStep] = useState(0);
   const pRef = useRef<HTMLParagraphElement>(null);
   useEffect(() => setStep(0), [base]);
   // Re-check once the device font has loaded (metrics change after the fallback font).
   const [, setTick] = useState(0);
   useEffect(() => {
-    if (translated === undefined) return;
+    if (checked === undefined) return;
     let alive = true;
     document.fonts?.ready.then(() => alive && setTick(t => t + 1));
     const ro = new ResizeObserver(() => setTick(t => t + 1));
     if (pRef.current) ro.observe(pRef.current);
     return () => { alive = false; ro.disconnect(); };
-  }, [translated]);
+  }, [checked]);
   // Too long for the Figma box → one font size smaller; still too long → listed for review.
   useLayoutEffect(() => {
     const el = pRef.current;
-    if (!el || translated === undefined || auto === 'W') return;
+    if (!el || checked === undefined || auto === 'W') return;
     const over = el.scrollHeight > n.h + 2 || el.scrollWidth > n.w + 1;
     const key = `${n.kk} (${lang})`;
-    if (over && step === 0 && FONT_STEP[runs[0][3] as number]) { setStep(1); SHRUNK.set(key, translated); }
-    else if (over) OVERFLOWS.set(key, translated);
+    if (over && step === 0 && FONT_STEP[runs[0][3] as number]) { setStep(1); SHRUNK.set(key, checked); }
+    else if (over) OVERFLOWS.set(key, checked);
     else OVERFLOWS.delete(key);
   });
   const fit = (size: number) => (step && FONT_STEP[size] ? FONT_STEP[size] : size);

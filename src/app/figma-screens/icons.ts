@@ -98,6 +98,7 @@ import iwvid56 from './icons/iwvid56.svg';
 import ixaqe7 from './icons/ixaqe7@4x.png';
 import ixc4pn from './icons/ixc4pn.svg';
 import ixsthj1 from './icons/ixsthj1.svg';
+import ixtlpd0 from './icons/ixtlpd0.svg';
 import ixw166 from './icons/ixw166.svg';
 import iy1f983 from './icons/iy1f983.svg';
 import iyazgwg from './icons/iyazgwg.svg';
@@ -204,6 +205,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   ixaqe7: { src: ixaqe7, w: 184, h: 36 },
   ixc4pn: { src: ixc4pn, w: 60, h: 60 },
   ixsthj1: { src: ixsthj1, w: 50, h: 50 },
+  ixtlpd0: { src: ixtlpd0, w: 136, h: 50 },
   ixw166: { src: ixw166, w: 272, h: 72 },
   iy1f983: { src: iy1f983, w: 272, h: 50 },
   iyazgwg: { src: iyazgwg, w: 50, h: 50 },

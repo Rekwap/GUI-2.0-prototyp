@@ -86,7 +86,7 @@ export function LanguageScreen({ onBack, onConfirm }: { onBack: () => void; onCo
 }
 
 type Step =
-  | 'start' | 'remove' | 'scan' | 'welcome'
+  | 'start' | 'remove' | 'scan' | 'noBarcode' | 'welcome'
   | 'weigh' | 'weighLocked' | 'yourWeight'
   | 'postureBad' | 'postureOk' | 'countdown' | 'heightProgress' | 'heightDone' | 'yourHeight'
   | 'overview' | 'sending' | 'ok' | 'dataSaved'
@@ -211,6 +211,15 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
           {/* Tapping the screen simulates scanning the patient barcode. */}
           <HitArea x={0} y={50} w={272} h={350} label="Simulate scan" onClick={go('welcome')} />
           <HitArea x={172} y={0} w={100} h={50} label="Language" onClick={() => setLangFrom('scan')} />
+          <HitArea x={12} y={410} w={248} h={56} label="No barcode?" onClick={go('noBarcode')} />
+        </FigmaScreen>
+      );
+
+    case 'noBarcode':
+      // "Don't have a barcode yet?" dialog (Figma 14582:48727); check returns to the scan screen.
+      return (
+        <FigmaScreen data={SCREENS.smNoBarcode}>
+          <HitArea x={68} y={402} w={136} h={50} label="OK" onClick={go('scan')} />
         </FigmaScreen>
       );
 

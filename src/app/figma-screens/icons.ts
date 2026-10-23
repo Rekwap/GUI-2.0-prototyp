@@ -50,6 +50,7 @@ import i1sunogg from './icons/i1sunogg.svg';
 import i1tjano1 from './icons/i1tjano1@4x.png';
 import i1tqpf52 from './icons/i1tqpf52.svg';
 import i1uv0wt5 from './icons/i1uv0wt5.svg';
+import i1v9ebkb from './icons/i1v9ebkb.svg';
 import i1vl5pux from './icons/i1vl5pux.svg';
 import i1w5nz6d from './icons/i1w5nz6d.svg';
 import i1wbop53 from './icons/i1wbop53.svg';
@@ -155,6 +156,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   i1tjano1: { src: i1tjano1, w: 164, h: 164 },
   i1tqpf52: { src: i1tqpf52, w: 42, h: 100 },
   i1uv0wt5: { src: i1uv0wt5, w: 50, h: 50 },
+  i1v9ebkb: { src: i1v9ebkb, w: 32, h: 32 },
   i1vl5pux: { src: i1vl5pux, w: 24, h: 24 },
   i1w5nz6d: { src: i1w5nz6d, w: 84, h: 68 },
   i1wbop53: { src: i1wbop53, w: 140, h: 50 },

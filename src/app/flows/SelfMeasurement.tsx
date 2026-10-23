@@ -51,7 +51,7 @@ const LANGS: { code: string; row: string }[] = [
   { code: 'fra', row: 'I14952:8107;15744:55' },
   { code: 'ita', row: 'I14952:8108;15744:86' },
   { code: 'por', row: 'I14952:8109;15744:119' },
-  { code: 'nld', row: 'I14952:8110;15744:152' },
+  { code: 'ind', row: 'I14952:8110;15744:152' }, // Nederlands replaced by Indonesia (flag from Figma flags_32x32=ID)
 ];
 const PAGING_ROW = '14944:53609';
 

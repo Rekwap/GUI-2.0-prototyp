@@ -117,7 +117,8 @@ function TextNode({ n, override, parentW }: { n: FNode; override?: string; paren
   useLayoutEffect(() => {
     const el = pRef.current;
     if (!el || checked === undefined || auto === 'W') return;
-    const over = el.scrollHeight > n.h + 2 || el.scrollWidth > n.w + 1;
+    // Auto-height text grows downwards in Figma, so only a fixed-height box can overflow vertically.
+    const over = (auto !== 'H' && el.scrollHeight > n.h + 2) || el.scrollWidth > n.w + 1;
     const key = `${n.kk} (${lang})`;
     if (over && step === 0 && FONT_STEP[runs[0][3] as number]) { setStep(1); SHRUNK.set(key, checked); }
     else if (over) OVERFLOWS.set(key, checked);

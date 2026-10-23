@@ -26,7 +26,8 @@ import send48Icon from './assets/icons/send48.svg';
 import send48StandaloneIcon from './assets/icons/send48Standalone.svg';
 import print48Icon from './assets/icons/print48.svg';
 import printStatusIcon from './assets/icons/printStatus.svg';
-import heightButton from './assets/icons/heightButton.svg';
+// Button without its outlined label; the label is live text (KEY_HEIGHT), as in Figma.
+import heightButton from './assets/icons/heightButtonBase.svg';
 import stepsIcon from './assets/icons/steps@4x.png';
 
 /* ------------------------------------------------------------------ */
@@ -217,6 +218,7 @@ export function HeightPanel(props: HeightPanelProps) {
       {props.state === 'start' && (
         <button type="button" onClick={props.onHeight} aria-label="Height" style={{ ...resetButton, position: 'absolute', left: 28, top: 20, width: 216, height: 58 }}>
           <Icon src={heightButton} x={0} y={0} w={216} h={58} />
+          <Text x={74} y={16} w={104} h={22} size={16} weight="medium" color={COLORS.text} align="center" valign="center">{t('KEY_HEIGHT', 'Height')}</Text>
         </button>
       )}
       {props.state === 'stepOnScale' && (

@@ -126,6 +126,12 @@ import hrUssMeasuring from './screens/11178-34108.json';
 import hrUssResult from './screens/11178-33520.json';
 import hrTactile from './screens/11178-33075.json';
 import hrManual from './screens/11178-33117.json';
+import ussMeas1 from './screens/12364-25981.json';
+import ussMeas2 from './screens/12364-25983.json';
+import ussMeas3 from './screens/12364-25985.json';
+import ussResult from './screens/12364-25987.json';
+import ussMin from './screens/12364-26026.json';
+import ussMax from './screens/12364-26028.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -253,6 +259,12 @@ export const SCREENS = {
   hrUssResult: hrUssResult as unknown as FNode,
   hrTactile: hrTactile as unknown as FNode,
   hrManual: hrManual as unknown as FNode,
+  ussMeas1: ussMeas1 as unknown as FNode,
+  ussMeas2: ussMeas2 as unknown as FNode,
+  ussMeas3: ussMeas3 as unknown as FNode,
+  ussResult: ussResult as unknown as FNode,
+  ussMin: ussMin as unknown as FNode,
+  ussMax: ussMax as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -380,5 +392,11 @@ export const FIGMA_IDS = {
   "hrUssMeasuring": "11178:34108",
   "hrUssResult": "11178:33520",
   "hrTactile": "11178:33075",
-  "hrManual": "11178:33117"
+  "hrManual": "11178:33117",
+  "ussMeas1": "12364:25981",
+  "ussMeas2": "12364:25983",
+  "ussMeas3": "12364:25985",
+  "ussResult": "12364:25987",
+  "ussMin": "12364:26026",
+  "ussMax": "12364:26028"
 } as const;

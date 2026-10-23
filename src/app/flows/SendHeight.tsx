@@ -6,12 +6,12 @@ import { FigmaScreen, HitArea } from '../figma-screens/FigmaScreen';
 import { SCREENS } from '../figma-screens/screens';
 import { useT } from '../i18n';
 import ManualHeightInput from '../components/ManualHeightInput';
+import { atLimit, stepHeight, stepperRange } from './UltrasonicHeight';
 
 type Step = 'add' | 'ussMeasuring' | 'ussResult' | 'tactile' | 'manual';
 
 /** Lowest position of the head slide (cm) — measurements below need the kids button. */
 const ROD_MIN_CM = 120;
-const INCH = 2.54;
 
 export function SendHeightFlow({ heightMode, isMetric, targetCm, formatImperial, onBack, onConfirm }: {
   heightMode: 'ultrasonic' | 'manual' | 'tactile';
@@ -25,6 +25,7 @@ export function SendHeightFlow({ heightMode, isMetric, targetCm, formatImperial,
   const t = useT();
   const [step, setStep] = useState<Step>('add');
   const [cm, setCm] = useState(0);
+  const [pressed, setPressed] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const raf = useRef<number | null>(null);
   useEffect(() => () => {
@@ -38,6 +39,7 @@ export function SendHeightFlow({ heightMode, isMetric, targetCm, formatImperial,
   const measureUltrasonic = () => {
     setStep('ussMeasuring');
     if (timer.current) clearTimeout(timer.current);
+    setPressed(false);
     timer.current = setTimeout(() => { setCm(targetCm); setStep('ussResult'); }, 1800);
   };
 
@@ -83,20 +85,21 @@ export function SendHeightFlow({ heightMode, isMetric, targetCm, formatImperial,
     }
     case 'ussResult': {
       const p = 'I11178:33521;';
-      // Steps: 0.5 cm (metric) / ¼ in (imperial, the display resolution).
-      const stepCm = isMetric ? 0.5 : INCH / 4;
+      // Steppers as on the ultrasonic result screen: first press rounds to x.0 / x.5, limits 30–300 cm.
+      const lim = atLimit(cm, isMetric);
+      const press = (dir: 1 | -1) => { setCm(v => stepHeight(v, dir, isMetric, !pressed)); setPressed(true); };
       return (
         <FigmaScreen
           data={SCREENS.hrUssResult}
           text={{
             [p + '11133:54414;10631:2236']: show(cm),
             [p + '11133:54414;10631:2232']: unit,
-            [p + '12144:23112']: isMetric ? '0.5 cm' : '¼ in',
+            [p + '12144:23112']: stepperRange(isMetric).label,
           }}
           onClick={{ [p + '11133:54415;10670:14624']: onBack }}
         >
-          <HitArea x={66} y={320} w={50} h={50} label="Minus" onClick={() => setCm(v => Math.max(0, v - stepCm))} />
-          <HitArea x={156} y={320} w={50} h={50} label="Plus" onClick={() => setCm(v => v + stepCm)} />
+          {!lim.min && <HitArea x={66} y={320} w={50} h={50} label="Minus" onClick={() => press(-1)} />}
+          {!lim.max && <HitArea x={156} y={320} w={50} h={50} label="Plus" onClick={() => press(1)} />}
           <HitArea x={8} y={416} w={72} h={56} label="Measure again" onClick={measureUltrasonic} />
           <HitArea x={92} y={416} w={172} h={56} label="Confirm" onClick={() => onConfirm(cm.toFixed(1))} />
         </FigmaScreen>

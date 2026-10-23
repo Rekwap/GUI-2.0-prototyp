@@ -30,6 +30,7 @@ import Network from "./components/Network";
 import ServerConnection from "./components/ServerConnection";
 import { TactileHeightScreen } from "./flows/TactileHeight";
 import { SendHeightFlow } from "./flows/SendHeight";
+import { UltrasonicHeightScreen } from "./flows/UltrasonicHeight";
 import { DeviceModeScreen, SelfMeasurementFlow } from "./flows/SelfMeasurement";
 import HeightConfirmation from "./components/HeightConfirmation";
 import TactileHeightMeasurementComplete from "./components/TactileHeightMeasurementComplete";
@@ -902,6 +903,8 @@ function AppContent() {
   const [showHeightRequiredPrompt, setShowHeightRequiredPrompt] = useState(false);
   // Height required but missing when sending: "Send with Height" flow (Figma 10795:26042).
   const [showSendHeight, setShowSendHeight] = useState(false);
+  // Ultrasonic measurement screens (Figma 11125:33087), from Height / re-measure on the main screen.
+  const [showUltrasonic, setShowUltrasonic] = useState(false);
   
   // Height confirmation screen state
   const [showHeightConfirmation, setShowHeightConfirmation] = useState(false);
@@ -1126,28 +1129,8 @@ function AppContent() {
     } else if (heightMode === 'tactile') {
       setShowTactileHeight(true);
     } else {
-      // Ultrasonic mode
-      // Standard workflow: Start the height measurement with animation
-      setHeightMeasured(true);
-      setIsHeightUpdating(true);
-      setHeightLoadingBars(0);
-      
-      // Animate bars sequentially - repeat animation twice
-      // First cycle
-      setTimeout(() => setHeightLoadingBars(1), 300);
-      setTimeout(() => setHeightLoadingBars(2), 600);
-      // Second cycle (repeat)
-      setTimeout(() => setHeightLoadingBars(0), 900);
-      setTimeout(() => setHeightLoadingBars(1), 1200);
-      setTimeout(() => setHeightLoadingBars(2), 1500);
-      
-      // After 1800ms, show the height value
-      setTimeout(() => {
-        setHeightValue(testHeight); // Set the measured height from Control Panel
-        setIsHeightUpdating(false);
-        setHeightLoadingBars(0);
-      }, 1800);
-    
+      // Ultrasonic: full-screen measurement (no measuring inside the main screen)
+      setShowUltrasonic(true);
     }
   };
 
@@ -1170,28 +1153,8 @@ function AppContent() {
       // Reset and show tactile height flow again
       setShowTactileHeight(true);
     } else {
-      // Ultrasonic mode
-      // Standard workflow: Start the loading animation - repeat the measurement animation
-      setIsHeightUpdating(true);
-      setHeightLoadingBars(0);
-      
-      // Animate bars sequentially - repeat animation twice
-      // First cycle
-      setTimeout(() => setHeightLoadingBars(1), 300);
-      setTimeout(() => setHeightLoadingBars(2), 600);
-      // Second cycle (repeat)
-      setTimeout(() => setHeightLoadingBars(0), 900);
-      setTimeout(() => setHeightLoadingBars(1), 1200);
-      setTimeout(() => setHeightLoadingBars(2), 1500);
-      
-      // After 1800ms, show the height value again
-      setTimeout(() => {
-        setIsHeightUpdating(false);
-        setHeightLoadingBars(0);
-        // Re-measurement takes the current test height from the control panel.
-        setHeightValue(testHeight);
-      }, 800);
-    
+      // Ultrasonic: repeat shows the measurement screens again
+      setShowUltrasonic(true);
     }
   };
 
@@ -1577,6 +1540,7 @@ function AppContent() {
     if (bootTimer.current) clearTimeout(bootTimer.current);
     bootTimer.current = setTimeout(() => setBooting(false), 800);
     setShowSendHeight(false);
+    setShowUltrasonic(false);
     setDeviceMode('choose');
     setWeight('0.00');
     setMotherMode(false);
@@ -1594,6 +1558,12 @@ function AppContent() {
     setIsUserLoggedIn(false);
     setHasEverMeasured(false);
     setFirstScannedId(null);
+  };
+
+  const handleUltrasonicConfirm = (cm: string) => {
+    setHeightValue(cm);
+    setHeightMeasured(true);
+    setShowUltrasonic(false);
   };
 
   const handleSendHeightConfirm = (cm: string) => {
@@ -2205,6 +2175,53 @@ function AppContent() {
             pretare={pretare}
             onPretareChange={handlePretareChange}
             uniqueId="-manual-tare"
+            onReset={handleReset}
+            zoomLevel={zoomLevel}
+            onZoomLevelChange={setZoomLevel}
+          />
+        )}
+      </div>
+    );
+  }
+
+  if (showUltrasonic) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center overflow-auto" style={{ gap: 'calc(2rem + 20px)', backgroundColor: '#202225' }}>
+        <div 
+          className="bg-white relative shadow-[0px_4px_10px_2px_rgba(155,161,179,0.4)] w-[272px] h-[480px] flex-shrink-0 device-screen" 
+          data-name="Ultrasonic Height"
+          style={{ 
+            transform: `scale(${zoomLevel / 100})`,
+            transformOrigin: 'center center'
+          }}
+        >
+          <UltrasonicHeightScreen
+            isMetric={isMetric}
+            targetCm={parseFloat(testHeight) || 0}
+            formatImperial={convertCmToFeetInches}
+            onBack={() => setShowUltrasonic(false)}
+            onConfirm={handleUltrasonicConfirm}
+          />
+        </div>
+        {showControlPanel && (
+          <ControlPanel 
+            heightMode={heightMode}
+            onHeightModeChange={setHeightMode}
+            heightRequired={heightRequired}
+            onHeightRequiredChange={setHeightRequired}
+            installationMode={installationMode}
+            onInstallationModeChange={setInstallationMode}
+            isMetric={isMetric}
+            onIsMetricChange={setIsMetric}
+            loginMode={loginMode}
+            onLoginModeChange={setLoginMode}
+            testHeight={testHeight}
+            testWeight={testWeight}
+            onTestWeightChange={handleTestWeightChange}
+            onTestHeightChange={handleTestHeightChange}
+            pretare={pretare}
+            onPretareChange={handlePretareChange}
+            uniqueId="-ultrasonic"
             onReset={handleReset}
             zoomLevel={zoomLevel}
             onZoomLevelChange={setZoomLevel}

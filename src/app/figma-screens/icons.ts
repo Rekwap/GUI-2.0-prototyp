@@ -86,6 +86,7 @@ import ioa8aku from './icons/ioa8aku.svg';
 import iokxo3m from './icons/iokxo3m.svg';
 import ipj5bwi from './icons/ipj5bwi.svg';
 import ipv30p4 from './icons/ipv30p4.svg';
+import isecaboot from './icons/isecaboot@4x.png';
 import isvyxt8 from './icons/isvyxt8.svg';
 import iszmjn9 from './icons/iszmjn9.svg';
 import it0lxy7 from './icons/it0lxy7.svg';
@@ -193,6 +194,7 @@ export const ICONS: Record<string, { src: string; w: number; h: number }> = {
   iokxo3m: { src: iokxo3m, w: 140, h: 50 },
   ipj5bwi: { src: ipj5bwi, w: 140, h: 50 },
   ipv30p4: { src: ipv30p4, w: 50, h: 24 },
+  isecaboot: { src: isecaboot, w: 138, h: 56 },
   isvyxt8: { src: isvyxt8, w: 80, h: 80 },
   iszmjn9: { src: iszmjn9, w: 270, h: 106 },
   it0lxy7: { src: it0lxy7, w: 80, h: 80 },

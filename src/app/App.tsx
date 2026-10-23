@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import svgPaths from "./imports/svg-3klf9qq62w";
 import taraSvgPaths from "./imports/svg-ghfkmimwkx";
 import heightSvgPaths from "./imports/svg-8ngzldbm4z";
@@ -831,6 +831,8 @@ function AppContent() {
   
   // Menu state
   const [showMenu, setShowMenu] = useState(false);
+  const [booting, setBooting] = useState(false);
+  const bootTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [currentMenuScreen, setCurrentMenuScreen] = useState<'main' | 'info' | 'settings' | 'service' | 'restart' | 'display' | 'language' | 'bmiBsa'>('main');
   
   // Height Calibration state
@@ -1593,6 +1595,10 @@ function AppContent() {
   };
 
   const handleReset = () => {
+    // Device restart: boot screen briefly, then Choose mode.
+    setBooting(true);
+    if (bootTimer.current) clearTimeout(bootTimer.current);
+    bootTimer.current = setTimeout(() => setBooting(false), 1500);
     setDeviceMode('choose');
     setWeight('0.00');
     setMotherMode(false);
@@ -1702,7 +1708,9 @@ function AppContent() {
             transformOrigin: 'center center'
           }}
         >
-          {deviceMode === 'choose'
+          {booting
+            ? <FigmaScreen data={SCREENS.bootScreen} />
+            : deviceMode === 'choose'
             ? <DeviceModeScreen onGuided={() => setDeviceMode('guided')} onSelf={() => setDeviceMode('self')} pretareText={persistentKg > 0 ? `${(isMetric ? persistentKg : kgToLbs(persistentKg)).toFixed(2)} ${isMetric ? 'kg' : 'lbs'}` : undefined} />
             : <SelfMeasurementFlow
                 weightKg={(parseFloat(testWeight) || 0) - persistentKg}

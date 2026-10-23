@@ -183,7 +183,8 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
             [p + '13854:39522']: ptText,
           }}
           // No persistent pre-tare: no "Pre-tare" row, no "Net".
-          hide={pt ? [] : [p + '14138:35745', p + '13854:39522', p + '13152:46913;14131:37789']}
+          // Metrology lines (>|1|< Max=…) are not shown.
+          hide={[p + '13152:46955', ...(pt ? [] : [p + '14138:35745', p + '13854:39522', p + '13152:46913;14131:37789'])]}
         />
       );
     }

@@ -1598,7 +1598,7 @@ function AppContent() {
     // Device restart: boot screen briefly, then Choose mode.
     setBooting(true);
     if (bootTimer.current) clearTimeout(bootTimer.current);
-    bootTimer.current = setTimeout(() => setBooting(false), 1500);
+    bootTimer.current = setTimeout(() => setBooting(false), 800);
     setDeviceMode('choose');
     setWeight('0.00');
     setMotherMode(false);

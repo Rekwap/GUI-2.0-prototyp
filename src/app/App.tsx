@@ -971,7 +971,8 @@ function AppContent() {
       return '---';
     }
     
-    if (isNaN(heightNum)) {
+    // No height (0 or invalid) → no BMI/BSA
+    if (isNaN(heightNum) || heightNum <= 0) {
       return '---';
     }
     
@@ -2856,7 +2857,7 @@ function AppContent() {
                 : selectedMode === 'bsa-haycock'
                   ? 0.024265 * Math.pow(recH, 0.3964) * Math.pow(recW, 0.5378)
                   : Math.sqrt((recH * recW) / 3600);
-              const recallHeight = !isNaN(recH) && recW > 0
+              const recallHeight = !isNaN(recH) && recW > 0 && recH > 0 && isFinite(ratio)
                 ? { value: formatHeight(rec.heightCm), unit: isMetric ? 'cm' : 'ft\'in"', bmi: ratio.toFixed(1), bmiLabel: label === 'BSA' ? 'm²' : label }
                 : undefined;
               return (

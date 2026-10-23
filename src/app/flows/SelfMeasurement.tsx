@@ -216,10 +216,10 @@ export function SelfMeasurementFlow({ weightKg, heightCm, isMetric, heightRequir
       );
 
     case 'noBarcode':
-      // "Don't have a barcode yet?" dialog (Figma 14582:48727); check returns to the scan screen.
+      // "Don't have a barcode yet?" dialog (Figma 14582:48727); check returns to the start (Step on scale).
       return (
         <FigmaScreen data={SCREENS.smNoBarcode}>
-          <HitArea x={68} y={402} w={136} h={50} label="OK" onClick={go('scan')} />
+          <HitArea x={68} y={402} w={136} h={50} label="OK" onClick={go('start')} />
         </FigmaScreen>
       );
 

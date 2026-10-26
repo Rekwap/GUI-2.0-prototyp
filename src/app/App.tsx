@@ -1325,6 +1325,12 @@ function AppContent() {
       setShowStandaloneInfo(true);
       return;
     }
+    // No weight measured → nothing can be sent ("No weight value", Figma 19616:86388), before any login
+    if (!(parseFloat(rawWeight) > 0)) {
+      setShowMissingDataDialog(true);
+      return;
+    }
+
     // Check if we're logged in (if required)
     if (!isLoggedIn) {
       if (loginMode === 'both') {
@@ -1334,13 +1340,6 @@ function AppContent() {
       } else if (loginMode === 'user-only') {
         setShowScanUserId(true);
       }
-      return;
-    }
-
-    // Check if weight is measured
-    const hasWeight = parseFloat(rawWeight) > 0;
-    if (!hasWeight) {
-      setShowMissingDataDialog(true);
       return;
     }
 
@@ -2877,16 +2876,7 @@ function AppContent() {
         {/* Missing Data Dialog Overlay */}
         {showMissingDataDialog && (
           <div className="absolute inset-0 z-50">
-            <Dialog 
-              missingData={{
-                weight: parseFloat(rawWeight) === 0,
-                height: heightRequired && !heightMeasured,
-                patientId: (loginMode === 'patient-only' || loginMode === 'both') && !isPatientLoggedIn,
-                userId: (loginMode === 'user-only' || loginMode === 'both') && !isUserLoggedIn
-              }}
-              onConfirm={handleMissingDataConfirm}
-              onCancel={handleMissingDataCancel}
-            />
+            <FigmaScreen data={SCREENS.noWeight} onClick={{ 'I10681:16523;10074:13792': handleMissingDataConfirm }} />
           </div>
         )}
       </div>

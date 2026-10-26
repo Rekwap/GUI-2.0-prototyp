@@ -132,6 +132,7 @@ import ussMeas3 from './screens/12364-25985.json';
 import ussResult from './screens/12364-25987.json';
 import ussMin from './screens/12364-26026.json';
 import ussMax from './screens/12364-26028.json';
+import noWeight from './screens/19616-86388.json';
 
 export const SCREENS = {
   tareAssistant: tareAssistant as unknown as FNode,
@@ -265,6 +266,7 @@ export const SCREENS = {
   ussResult: ussResult as unknown as FNode,
   ussMin: ussMin as unknown as FNode,
   ussMax: ussMax as unknown as FNode,
+  noWeight: noWeight as unknown as FNode,
 };
 
 export const FIGMA_IDS = {
@@ -398,5 +400,6 @@ export const FIGMA_IDS = {
   "ussMeas3": "12364:25985",
   "ussResult": "12364:25987",
   "ussMin": "12364:26026",
-  "ussMax": "12364:26028"
+  "ussMax": "12364:26028",
+  "noWeight": "19616:86388"
 } as const;

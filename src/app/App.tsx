@@ -1405,22 +1405,38 @@ function AppContent() {
     // Else: return to main screen (no action needed)
   };
 
+  // ID confirmation screens (2 s, or tap). In login mode "Both" the patient confirmation leads to
+  // "Scan the user ID", the user confirmation then continues (Figma 19618:86389).
+  const idTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bothNext = useRef<'none' | 'second' | 'done'>('none');
+  const idConfirmed = () => {
+    if (idTimer.current) { clearTimeout(idTimer.current); idTimer.current = null; }
+    setShowPatientId(false);
+    setShowUserIdConfirmed(false);
+    if (bothNext.current === 'second') {
+      bothNext.current = 'none';
+      setShowScanBothIds(true);
+      return;
+    }
+    if (bothNext.current === 'done') {
+      bothNext.current = 'none';
+      setFirstScannedId(null);
+    }
+    proceedAfterLogin();
+  };
+  const showIdConfirmation = (kind: 'patient' | 'user') => {
+    if (kind === 'patient') setShowPatientId(true); else setShowUserIdConfirmed(true);
+    if (idTimer.current) clearTimeout(idTimer.current);
+    idTimer.current = setTimeout(idConfirmed, 2000);
+  };
+
   const handleScanPatientIdConfirm = () => {
     setIsPatientLoggedIn(true);
     setShowScanPatientId(false);
-    setShowPatientId(true);
-    
-    // Auto-proceed after 2 seconds
-    setTimeout(() => {
-      setShowPatientId(false);
-      proceedAfterLogin();
-    }, 2000);
+    showIdConfirmation('patient');
   };
 
-  const handlePatientIdNext = () => {
-    setShowPatientId(false);
-    proceedAfterLogin();
-  };
+  const handlePatientIdNext = () => idConfirmed();
 
   const handleScanPatientIdCancel = () => {
     setShowScanPatientId(false);
@@ -1429,49 +1445,29 @@ function AppContent() {
   const handleScanUserIdConfirm = () => {
     setIsUserLoggedIn(true);
     setShowScanUserId(false);
-    setShowUserIdConfirmed(true);
-    
-    // Auto-proceed after 2 seconds
-    setTimeout(() => {
-      setShowUserIdConfirmed(false);
-      proceedAfterLogin();
-    }, 2000);
+    showIdConfirmation('user');
   };
 
-  const handleUserIdNext = () => {
-    setShowUserIdConfirmed(false);
-    proceedAfterLogin();
-  };
+  const handleUserIdNext = () => idConfirmed();
 
   const handleScanUserIdCancel = () => {
     setShowScanUserId(false);
   };
 
   const handleScanBothIdsConfirm = (id: 'patient' | 'user') => {
+    if (id === 'patient') setIsPatientLoggedIn(true); else setIsUserLoggedIn(true);
+    setShowScanBothIds(false);
     if (!firstScannedId) {
-      // First scan
       setFirstScannedId(id);
-      if (id === 'patient') {
-        setIsPatientLoggedIn(true);
-      } else {
-        setIsUserLoggedIn(true);
-      }
+      bothNext.current = 'second';
     } else {
-      // Second scan - both IDs now scanned
-      if (id === 'patient') {
-        setIsPatientLoggedIn(true);
-      } else {
-        setIsUserLoggedIn(true);
-      }
-      setShowScanBothIds(false);
-      setFirstScannedId(null);
-      
-      // Check next step after login
-      proceedAfterLogin();
+      bothNext.current = 'done';
     }
+    showIdConfirmation(id);
   };
 
   const handleScanBothIdsCancel = () => {
+    bothNext.current = 'none';
     setShowScanBothIds(false);
     setFirstScannedId(null);
     setIsPatientLoggedIn(false);
@@ -2633,8 +2629,9 @@ function AppContent() {
         >
           {/* Patient + user: scan the patient ID first, then the user ID */}
           <ScanIdScreen
-            kind={firstScannedId ? 'user' : 'patient'}
-            onScan={() => handleScanBothIdsConfirm(firstScannedId ? 'user' : 'patient')}
+            kind={firstScannedId ? (firstScannedId === 'patient' ? 'user' : 'patient') : 'patient'}
+            either={!firstScannedId}
+            onScan={() => handleScanBothIdsConfirm(firstScannedId ? (firstScannedId === 'patient' ? 'user' : 'patient') : 'patient')}
             onCancel={handleScanBothIdsCancel}
           />
         </div>

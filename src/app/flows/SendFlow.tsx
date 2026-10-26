@@ -53,9 +53,12 @@ export function RecallScreen({ weightKg, tareKg, minutesAgo, isMetric, height, o
 /* Identification                                                       */
 /* ------------------------------------------------------------------ */
 
-export function ScanIdScreen({ kind, onScan, onCancel }: { kind: 'patient' | 'user'; onScan: () => void; onCancel: () => void }) {
+export function ScanIdScreen({ kind, either, onScan, onCancel }: { kind: 'patient' | 'user'; either?: boolean; onScan: () => void; onCancel: () => void }) {
+  const t = useT();
+  // Login mode "Both", first scan: "Scan the patient ID or the user ID".
+  const text = either ? { 'I10657:11645;10120:378': t('KEY_SCAN_PATIENT_USER_ID', 'Scan the patient ID or the user ID') } : undefined;
   return (
-    <FigmaScreen data={kind === 'patient' ? SCREENS.scanPatient : SCREENS.scanUser}>
+    <FigmaScreen data={kind === 'patient' ? SCREENS.scanPatient : SCREENS.scanUser} text={text}>
       {/* Tapping the screen simulates a barcode scan. */}
       <HitArea x={0} y={50} w={272} h={430} label="Simulate scan" onClick={onScan} />
       <HitArea x={222} y={0} w={50} h={50} label="Cancel" onClick={onCancel} />

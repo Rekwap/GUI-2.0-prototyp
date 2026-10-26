@@ -147,8 +147,13 @@ export function TransmittingScreen() {
   return <FigmaScreen data={SCREENS.transmitting} />;
 }
 
-export function DataSavedScreen() {
-  return <FigmaScreen data={SCREENS.dataSaved} />;
+export function DataSavedScreen({ onClose }: { onClose?: () => void }) {
+  // "Data saved": 3 s time-out or tap (check mark).
+  return (
+    <FigmaScreen data={SCREENS.dataSaved}>
+      <HitArea x={0} y={0} w={272} h={480} label="OK" onClick={onClose} />
+    </FigmaScreen>
+  );
 }
 
 /* ------------------------------------------------------------------ */

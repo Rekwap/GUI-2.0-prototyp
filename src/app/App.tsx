@@ -912,6 +912,9 @@ function AppContent() {
   // Data saved screen state
   const [showDataSaved, setShowDataSaved] = useState(false);
   const [showTransmitting, setShowTransmitting] = useState(false);
+  // After sending: integration data (logins) cleared, CONFIRM shows SAVED until the next measurement.
+  const [sent, setSent] = useState(false);
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Last sent measurement, shown by RECALL
   const [lastSent, setLastSent] = useState<{ weightKg: number; tareKg: number; time: number; heightCm: string | null } | null>(null);
   
@@ -1038,6 +1041,7 @@ function AppContent() {
 
   // Step off: assistant tares end, the persistent pre-tare applies again.
   const handleStepOff = () => {
+    setSent(false);
     setRawWeight('0.00');
     setWeight('0.00');
     setTaredWeight(null);
@@ -1059,6 +1063,7 @@ function AppContent() {
   };
 
   const handleWeightClick = () => {
+    setSent(false);
     setSteppedOff(false);
     // If tared and showing 0.00, show baby weight (3.8 kg)
     if (taredWeight !== null && parseFloat(weight) === 0) {
@@ -1106,6 +1111,7 @@ function AppContent() {
   };
 
   const handleReweight = () => {
+    setSent(false);
     setIsReweighting(true);
     // Use rawWeight (stored in kg) instead of weight (could be lbs or affected by tare)
     const measuredWeight = parseFloat(rawWeight);
@@ -1180,6 +1186,7 @@ function AppContent() {
   };
 
   const handleManualInputSave = (height: string) => {
+    setSent(false);
     setHeightValue(height);
     setHeightMeasured(true);
     setShowManualInput(false);
@@ -1207,6 +1214,7 @@ function AppContent() {
   };
 
   const handleTactileHeightComplete = (measured?: string) => {
+    setSent(false);
     // Height confirmed - save the value shown by the head slide and return to main
     const height = measured ?? testHeight;
     setHeightValue(height);
@@ -1251,6 +1259,7 @@ function AppContent() {
   };
 
   const handleTareConfirm = () => {
+    setSent(false);
     // Close the tare assistant when confirming
     setShowTareAssistant(false);
     
@@ -1375,7 +1384,13 @@ function AppContent() {
     setTimeout(() => {
       setShowTransmitting(false);
       setShowDataSaved(true);
-      setTimeout(() => setShowDataSaved(false), 2000);
+      // The interface deletes all integration data after the transfer (Figma 19620:86390).
+      setIsPatientLoggedIn(false);
+      setIsUserLoggedIn(false);
+      setFirstScannedId(null);
+      setSent(true);
+      if (savedTimer.current) clearTimeout(savedTimer.current);
+      savedTimer.current = setTimeout(() => setShowDataSaved(false), 3000);
     }, 1500);
   };
 
@@ -1535,6 +1550,7 @@ function AppContent() {
   };
 
   const handleReset = () => {
+    setSent(false);
     // Device restart: boot screen briefly, then Choose mode.
     setBooting(true);
     if (bootTimer.current) clearTimeout(bootTimer.current);
@@ -1561,12 +1577,14 @@ function AppContent() {
   };
 
   const handleUltrasonicConfirm = (cm: string) => {
+    setSent(false);
     setHeightValue(cm);
     setHeightMeasured(true);
     setShowUltrasonic(false);
   };
 
   const handleSendHeightConfirm = (cm: string) => {
+    setSent(false);
     setHeightValue(cm);
     setHeightMeasured(true);
     setShowSendHeight(false);
@@ -2723,7 +2741,7 @@ function AppContent() {
             transformOrigin: 'center center'
           }}
         >
-          {showTransmitting ? <TransmittingScreen /> : <DataSavedScreen />}
+          {showTransmitting ? <TransmittingScreen /> : <DataSavedScreen onClose={() => { if (savedTimer.current) clearTimeout(savedTimer.current); setShowDataSaved(false); }} />}
         </div>
         {showControlPanel && (
           <ControlPanel 
@@ -2824,7 +2842,7 @@ function AppContent() {
                 hideRemove: ptOnly,
               }}
               height={height}
-              buttons={{ onTare: handleTareClick, onRecall: handleRecallClick, onConfirm: handleSendClick, standalone: installationMode !== 'integrated', print: installationMode === 'simpleprint' }}
+              buttons={{ onTare: handleTareClick, onRecall: handleRecallClick, onConfirm: handleSendClick, standalone: installationMode !== 'integrated', print: installationMode === 'simpleprint', saved: sent && installationMode === 'integrated' }}
             />
           );
         })()}

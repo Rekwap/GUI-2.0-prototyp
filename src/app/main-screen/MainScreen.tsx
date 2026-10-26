@@ -25,6 +25,7 @@ import recall48Icon from './assets/icons/recall48.svg';
 import send48Icon from './assets/icons/send48.svg';
 import send48StandaloneIcon from './assets/icons/send48Standalone.svg';
 import print48Icon from './assets/icons/print48.svg';
+import saved48Icon from './assets/icons/saved48.svg';
 import printStatusIcon from './assets/icons/printStatus.svg';
 // Button without its outlined label; the label is live text (KEY_HEIGHT), as in Figma.
 import heightButton from './assets/icons/heightButtonBase.svg';
@@ -252,6 +253,8 @@ export type ButtonBarProps = {
   standalone?: boolean;
   /** Simple print: third button is PRINT (prints only, no screen change). */
   print?: boolean;
+  /** After sending: third button shows SAVED (check icon) until the next measurement. */
+  saved?: boolean;
 };
 
 function BarButton({ x, icon, label, active, onClick }: { x: number; icon: string; label: string; active?: boolean; onClick?: () => void }) {
@@ -267,14 +270,16 @@ function BarButton({ x, icon, label, active, onClick }: { x: number; icon: strin
   );
 }
 
-export function ButtonBar({ onTare, onRecall, onConfirm, standalone, print }: ButtonBarProps) {
+export function ButtonBar({ onTare, onRecall, onConfirm, standalone, print, saved }: ButtonBarProps) {
   const t = useT();
   return (
     <Box x={0} y={408} w={272} h={72} style={{ background: COLORS.white }}>
       <Icon src={buttonBarBg} x={0} y={0} w={272} h={72} />
       <BarButton x={12} icon={tare48Icon} label={t('KEY_TARE', 'TARE')} onClick={onTare} />
       <BarButton x={95} icon={recall48Icon} label={t('KEY_RECALL', 'RECALL')} onClick={onRecall} />
-      {print
+      {saved
+        ? <BarButton x={178} icon={saved48Icon} label={t('KEY_SAVED', 'Saved').toUpperCase()} active />
+        : print
         ? <BarButton x={178} icon={print48Icon} label={t('KEY_PRINT', 'PRINT')} onClick={onConfirm} />
         : <BarButton x={178} icon={standalone ? send48StandaloneIcon : send48Icon} label={t('KEY_SEND_HOME', 'CONFIRM')} active={!standalone} onClick={onConfirm} />}
     </Box>

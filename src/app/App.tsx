@@ -1317,6 +1317,12 @@ function AppContent() {
   };
 
   const handleSendClick = () => {
+    // No weight measured → nothing can be sent ("No weight value", Figma 19616:86388), in every installation mode, before anything else
+    if (!(parseFloat(rawWeight) > 0)) {
+      setShowMissingDataDialog(true);
+      return;
+    }
+
     if (installationMode === 'simpleprint') {
       setPrinting(true);
       return;
@@ -1325,12 +1331,6 @@ function AppContent() {
       setShowStandaloneInfo(true);
       return;
     }
-    // No weight measured → nothing can be sent ("No weight value", Figma 19616:86388), before any login
-    if (!(parseFloat(rawWeight) > 0)) {
-      setShowMissingDataDialog(true);
-      return;
-    }
-
     // Check if we're logged in (if required)
     if (!isLoggedIn) {
       if (loginMode === 'both') {

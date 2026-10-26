@@ -1051,6 +1051,10 @@ function AppContent() {
     setHeightMeasured(false);
     setHeightValue(null);
     setShowBsa(false);
+    // ... and the login (patient / user) ends.
+    setIsPatientLoggedIn(false);
+    setIsUserLoggedIn(false);
+    setFirstScannedId(null);
     setSteppedOff(true);
   };
 
